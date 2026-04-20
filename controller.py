@@ -6,7 +6,7 @@ import time
 import json
 import paho.mqtt.client as mqtt
 
-BROKER = "172.20.10.12"
+BROKER = "broker.hivemq.com"
 state = "INIT"
 
 def on_message(client, userdata, msg):
