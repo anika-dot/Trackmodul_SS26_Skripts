@@ -8,7 +8,7 @@ BROKER = "broker.hivemq.com"
 
 # Connect to dobot 1
 ports = find_dobot_ports()
-dobot1 = Dobot(port=ports[0])
+dobot1 = Dobot(port=ports[1])
 dobot1.connect()
 
 print("Dobot Pick & Place ready")
