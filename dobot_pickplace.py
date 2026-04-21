@@ -8,7 +8,7 @@ BROKER = "broker.hivemq.com"
 
 # Connect to dobot 1
 ports = find_dobot_ports()
-dobot1 = Dobot(port=ports[1])
+dobot1 = Dobot(port=ports[0])
 dobot1.connect()
 
 print("Dobot Pick & Place ready")
@@ -20,9 +20,9 @@ def on_message(client, userdata, msg):
     if data.get("command") == "start":
         print("Dobot Pick & Place start task")
 
-        home_position = (185.0, 100.0, 118.0, 57.0) #(225.0, -25.0, 100.0, 22.0)
-        pick_position = (200.0, 150.0, 20.38, 45) #(200.28, 119.57, 20.38, 38.43)
-        sensor_position = (43.84, 240.0, 45.0, 86.45) #(43.84, 222.58, 43.59, 86.45) 
+        home_position = (185.0, 100.0, 118.0, 90) #(225.0, -25.0, 100.0, 22.0)
+        pick_position = (186.42, 152.0, 29.169, 90) #(200.28, 119.57, 20.38, 38.43)
+        sensor_position = (19.272, 233.825, 46.538, 90) #(43.84, 222.58, 43.59, 86.45) 
 
         # dobot to home position
         print("Drive to home...")
