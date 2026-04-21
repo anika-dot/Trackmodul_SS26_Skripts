@@ -6,7 +6,7 @@ import paho.mqtt.client as mqtt
 from dobotapi import Dobot
 from dobot_functions import find_dobot_ports
 
-BROKER = "172.20.10.12"
+BROKER = "broker.hivemq.com"
 
 # Connect to dobot 2
 ports = find_dobot_ports()
@@ -75,7 +75,7 @@ def on_message(client, userdata, msg):
 
         print("Dobot Sorter finished sorting other")
 
-        client.publish("dobot/sorter/status", json.dumps({
+        client.publish("trackmodul_ah_SS26/dobot/sorter/status", json.dumps({
             "status": "done"
         }), qos=1)
 
@@ -130,7 +130,7 @@ def on_message(client, userdata, msg):
 
         print("Dobot Sorter finished sorting other")
 
-        client.publish("dobot/sorter/status", json.dumps({
+        client.publish("trackmodul_ah_SS26/dobot/sorter/status", json.dumps({
             "status": "done"
         }), qos=1)
 
@@ -138,6 +138,6 @@ client = mqtt.Client()
 client.on_message = on_message
 
 client.connect(BROKER, 1883)
-client.subscribe("dobot/sorter/command")
+client.subscribe("trackmodul_ah_SS26/dobot/sorter/command")
 
 client.loop_forever()

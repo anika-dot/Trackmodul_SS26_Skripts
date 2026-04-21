@@ -7,7 +7,7 @@ import paho.mqtt.client as mqtt
 from dobot_functions import find_dobot_ports
 from pydobotplus import Dobot
 
-BROKER = "172.20.10.12"
+BROKER = "broker.hivemq.com"
 
 # Connect to color sensor
 ports = find_dobot_ports()
@@ -37,7 +37,7 @@ def on_message(client, userdata, msg):
         else:
             color = "other"
 
-        client.publish("dobot/colorsensor/status", json.dumps({
+        client.publish("trackmodul_ah_SS26/dobot/colorsensor/status", json.dumps({
             "status": "done",
             "color": color  
         }), qos=1)
@@ -46,6 +46,6 @@ client = mqtt.Client()
 client.on_message = on_message
 
 client.connect(BROKER, 1883)
-client.subscribe("dobot/colorsensor/command")
+client.subscribe("trackmodul_ah_SS26/dobot/colorsensor/command")
 
 client.loop_forever()

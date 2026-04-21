@@ -13,30 +13,30 @@ def on_message(client, userdata, msg):
     global state
 
     data = json.loads(msg.payload.decode())
-    topic = msg.topic
+    topic = msg.topic 
 
     print(f"[RECV] {topic} -> {data}")
 
-    if topic == "dobot/pickplace/status" and state == "WAIT_D_pickplace":
+    if topic == "trackmodul_ah_SS26/dobot/pickplace/status" and state == "WAIT_D_pickplace":
         print("Start Color Sensor")
-        client.publish("dobot/colorsensor/command", json.dumps({"command": "scanning"}))
+        client.publish("trackmodul_ah_SS26/dobot/colorsensor/command", json.dumps({"command": "scanning"}))
         state = "WAIT_D_color_sensor"
 
-    elif topic == "dobot/colorsensor/status" and state == "WAIT_D_color_sensor":
+    elif topic == "trackmodul_ah_SS26/dobot/colorsensor/status" and state == "WAIT_D_color_sensor":
         detected_color = data.get("color")
 
         print(f"Detected color: {detected_color}")
 
         if detected_color == "blue":
             print("Start Dobot Sorter: BLUE")
-            client.publish("dobot/sorter/command", json.dumps({"command": "sorting blue"}))
+            client.publish("trackmodul_ah_SS26/dobot/sorter/command", json.dumps({"command": "sorting blue"}))
         else:
             print("Start Dobot Sorter: OTHER")
-            client.publish("dobot/sorter/command", json.dumps({"command": "sorting other"}))
+            client.publish("trackmodul_ah_SS26/dobot/sorter/command", json.dumps({"command": "sorting other"}))
         
         state = "WAIT_D_Sorter"
 
-    elif topic == "dobot/sorter/status" and state == "WAIT_D_Sorter":
+    elif topic == "trackmodul_ah_SS26/dobot/sorter/status" and state == "WAIT_D_Sorter":
         print("Finished all tasks")
         state = "DONE"
 
@@ -44,14 +44,14 @@ client = mqtt.Client()
 client.on_message = on_message
 
 client.connect(BROKER, 1883)
-client.subscribe("dobot/+/status")
+client.subscribe("trackmodul_ah_SS26/dobot/+/status")
 
 client.loop_start()
 
 time.sleep(1)
 
 print("Start Dobot Pick & Place")
-client.publish("dobot/pickplace/command", json.dumps({"command": "start"}))
+client.publish("trackmodul_ah_SS26/dobot/pickplace/command", json.dumps({"command": "start"}))
 state = "WAIT_D_pickplace"
 
 while state != "DONE":
