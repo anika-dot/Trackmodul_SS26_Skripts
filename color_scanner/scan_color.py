@@ -14,12 +14,14 @@ ports = find_dobot_ports()
 color_sensor = Dobot(port=ports[0])
 
 print("Color sensor ready")
+# log message "Color sensor ready"
 
 def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
 
     if data.get("command") == "scanning":
         print("Color sensor start scanning")
+        # log message "Color sensor start scanning"
 
         VERSION = 2  # Set to 2 for Dobot Magician, 1 for Dobot M1
 
@@ -31,12 +33,12 @@ def on_message(client, userdata, msg):
         rgb = color_sensor.get_color()
         time.sleep(0.3)
         print("Color sensor finished scanning")
-
+        # log message "Color sensor finished scanning"
         if rgb == [False, False, True]:
             color = "blue"
         else:
             color = "other"
-
+        
         client.publish("trackmodul_ah_SS26/dobot/colorsensor/status", json.dumps({
             "status": "done",
             "color": color  

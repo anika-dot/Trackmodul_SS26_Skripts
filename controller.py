@@ -19,6 +19,7 @@ def on_message(client, userdata, msg):
 
     if topic == "trackmodul_ah_SS26/dobot/pickplace/status" and state == "WAIT_D_pickplace":
         print("Start Color Sensor")
+        # log message "Start Color Sensor"
         client.publish("trackmodul_ah_SS26/dobot/colorsensor/command", json.dumps({"command": "scanning"}))
         state = "WAIT_D_color_sensor"
 
@@ -26,18 +27,21 @@ def on_message(client, userdata, msg):
         detected_color = data.get("color")
 
         print(f"Detected color: {detected_color}")
-
+        # log message "get colour from color sensor: {detected_color}"
         if detected_color == "blue":
             print("Start Dobot Sorter: BLUE")
+            # log message "Start Dobot Sorter: BLUE"
             client.publish("trackmodul_ah_SS26/dobot/sorter/command", json.dumps({"command": "sorting blue"}))
         else:
             print("Start Dobot Sorter: OTHER")
+            # log message "Start Dobot Sorter: OTHER"
             client.publish("trackmodul_ah_SS26/dobot/sorter/command", json.dumps({"command": "sorting other"}))
         
         state = "WAIT_D_Sorter"
 
     elif topic == "trackmodul_ah_SS26/dobot/sorter/status" and state == "WAIT_D_Sorter":
         print("Finished all tasks")
+        # log message "Finished all tasks"
         state = "DONE"
 
 client = mqtt.Client()
@@ -51,6 +55,7 @@ client.loop_start()
 time.sleep(1)
 
 print("Start Dobot Pick & Place")
+# log message "Start Dobot Pick & Place"
 client.publish("trackmodul_ah_SS26/dobot/pickplace/command", json.dumps({"command": "start"}))
 state = "WAIT_D_pickplace"
 

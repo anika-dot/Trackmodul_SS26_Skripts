@@ -12,6 +12,7 @@ dobot1 = Dobot(port=ports[1])
 dobot1.connect()
 
 print("Dobot Pick & Place ready")
+# log message "Dobot Pick & Place ready"
 
 
 def on_message(client, userdata, msg):
@@ -19,6 +20,7 @@ def on_message(client, userdata, msg):
 
     if data.get("command") == "start":
         print("Dobot Pick & Place start task")
+        # log message "Dobot Pick & Place start task"
 
         home_position = (185.0, 100.0, 118.0, 57.0) #(225.0, -25.0, 100.0, 22.0)
         pick_position = (200.0, 150.0, 20.38, 45) #(200.28, 119.57, 20.38, 38.43)
@@ -83,6 +85,7 @@ def on_message(client, userdata, msg):
         print("Fertig")
 
         print("Dobot 1 finished task")
+        # log message "Dobot 1 finished task"
 
         client.publish("trackmodul_ah_SS26/dobot/pickplace/status", json.dumps({
             "status": "done"

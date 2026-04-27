@@ -14,6 +14,7 @@ dobot2 = Dobot(port=ports[0])
 dobot2.connect()
 
 print("Dobot Sorter ready")
+# log message "Dobot Sorter ready"
 
 home_position = (154.84, 25.89, 38.79, 18.44) #(154.84, 25.89, 38.79, 18.44) #(225.0, -25.0, 100.0, 22.0)
 sensor_position = (150.0, 45.0, 45.0, 40.0) #(148.35, -25.89, 38.79, 18.44) #(200.0, 200.0, 80.0, 25.0)
@@ -25,6 +26,7 @@ def on_message(client, userdata, msg):
 
     if data.get("command") == "sorting other":
         print("Dobot Sorter start sorting other")
+        # log message "Dobot Sorter start sorting other"
 
         # dobot to home position
         print("Drive to home...")
@@ -74,6 +76,7 @@ def on_message(client, userdata, msg):
         dobot2.close()
 
         print("Dobot Sorter finished sorting other")
+        # log message "Dobot Sorter finished sorting other"
 
         client.publish("trackmodul_ah_SS26/dobot/sorter/status", json.dumps({
             "status": "done"
@@ -81,6 +84,7 @@ def on_message(client, userdata, msg):
 
     elif data.get("command") == "sorting blue":
         print("Dobot Sorter sorting blue")
+        # log message "Dobot Sorter sorting blue"
 
         # dobot to home position
         print("Drive to home...")
@@ -129,6 +133,7 @@ def on_message(client, userdata, msg):
         dobot2.close()
 
         print("Dobot Sorter finished sorting other")
+        # log message "Dobot Sorter finished sorting other"
 
         client.publish("trackmodul_ah_SS26/dobot/sorter/status", json.dumps({
             "status": "done"
