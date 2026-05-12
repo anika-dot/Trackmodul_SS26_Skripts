@@ -4,8 +4,8 @@ from turtle import color
 from xml.etree.ElementTree import VERSION
 from xmlrpc import client
 import paho.mqtt.client as mqtt
-from dobot_functions import find_dobot_ports
 from pydobotplus import Dobot
+from dobot_functions import find_dobot_ports
 from event_logger import EventLogger
 
 BROKER = "broker.hivemq.com"
