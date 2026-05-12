@@ -6,7 +6,7 @@ ports = find_dobot_ports()
 print(ports)
 
 # ✅ Richtige Ports wählen!
-dobot = init_and_home_dobot(ports[1])
+dobot = init_and_home_dobot(ports[0])
 
 time.sleep(1)
 

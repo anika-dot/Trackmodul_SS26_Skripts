@@ -5,15 +5,12 @@ import time
 ports = find_dobot_ports()
 print(ports)
 
-# ✅ Richtige Ports wählen!
+# Richtige Ports wählen!
 dobot = init_and_home_dobot(ports[1])
 
 time.sleep(1)
 
 print("dobot:", dobot)
-
-# ❗ NICHT vorher schließen!
-# pos1 = dobot.get_pose()
 
 # Positionen
 # Home: 209.6999969482422, 0.0, 100.0, 0.0
@@ -27,7 +24,5 @@ safe_move(dobot, place_color_sensor_pick_place)
 
 time.sleep(0.5)
 
-#print("Dobot Position:", pos1)
-
-# ✅ ERST AM ENDE schließen
+# ERST AM ENDE schließen
 dobot.interface.close_col()

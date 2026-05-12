@@ -4,7 +4,7 @@ import time
 from turtle import color
 import paho.mqtt.client as mqtt
 from dobotapi import Dobot
-from dobot_functions import find_dobot_ports
+from dobot_functions import find_dobot_ports, safe_move
 
 BROKER = "broker.hivemq.com"
 
@@ -30,7 +30,8 @@ def on_message(client, userdata, msg):
 
         # dobot to home position
         print("Drive to home...")
-        dobot2.move_to(*HOME_POSITION)
+        safe_move(dobot2, HOME_POSITION)
+        # dobot2.move_to(*HOME_POSITION)
         time.sleep(SLEEP_TIME)
 
         # gripper opens
@@ -40,7 +41,8 @@ def on_message(client, userdata, msg):
 
         # dobot to color sensor position
         print("Arm to color sensor...")
-        dobot2.move_to(*SENSOR_POSITION)
+        safe_move(dobot2, SENSOR_POSITION)
+        # dobot2.move_to(*SENSOR_POSITION)
         time.sleep(SLEEP_TIME)
 
         # gripper closes
@@ -51,7 +53,8 @@ def on_message(client, userdata, msg):
 
         # throw block away
         print("Color is not blue, throwing...")
-        dobot2.move_to(*THROW_POSITION)
+        safe_move(dobot2, THROW_POSITION)
+        # dobot2.move_to(*THROW_POSITION)
         time.sleep(SLEEP_TIME)
         dobot2.gripper.open()
         print("Block placed throwing position")
@@ -63,7 +66,8 @@ def on_message(client, userdata, msg):
 
         # arm back to home
         print("Drive to home...")
-        dobot2.move_to(*HOME_POSITION)
+        safe_move(dobot2, HOME_POSITION)
+        # dobot2.move_to(*HOME_POSITION)
         time.sleep(SLEEP_TIME)
 
         # gripper closes
@@ -86,7 +90,8 @@ def on_message(client, userdata, msg):
 
         # dobot to home position
         print("Drive to home...")
-        dobot2.move_to(*HOME_POSITION)
+        safe_move(dobot2, HOME_POSITION)
+        # dobot2.move_to(*HOME_POSITION)
         time.sleep(SLEEP_TIME)
 
         # gripper opens
@@ -96,7 +101,8 @@ def on_message(client, userdata, msg):
 
         # dobot to color sensor position
         print("Arm to color sensor...")
-        dobot2.move_to(*SENSOR_POSITION)
+        safe_move(dobot2, SENSOR_POSITION)
+        #dobot2.move_to(*SENSOR_POSITION)
         time.sleep(SLEEP_TIME)
 
         # gripper closes
@@ -118,7 +124,8 @@ def on_message(client, userdata, msg):
 
         # arm back to home
         print("Drive to home...")
-        dobot2.move_to(*HOME_POSITION)
+        safe_move(dobot2, HOME_POSITION)
+        #dobot2.move_to(*HOME_POSITION)
         time.sleep(SLEEP_TIME)
 
         # gripper closes

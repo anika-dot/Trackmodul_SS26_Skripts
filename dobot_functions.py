@@ -61,17 +61,43 @@ def init_and_home_dobot(port, move_to_resting=False):
 
 SAFE_Z = 120  # sichere Höhe über allen Objekten
 
+# def safe_move(bot, target, safe_z=SAFE_Z):
+#     x, y, z, r = target
+
+#     # 1. hochfahren (falls nicht schon oben)
+#     bot.move_to(x, y, safe_z, r, mode=1)
+#     sleep(1)
+
+#     # 2. XY Position sicher anfahren (oben)
+#     #bot.move_to(x, y, safe_z, r, mode=1)
+#     #sleep(1)
+
+#     # 3. runter zur Zielhöhe
+#     bot.move_to(x, y, z, r, mode=1)
+#     sleep(1)
+
 def safe_move(bot, target, safe_z=SAFE_Z):
     x, y, z, r = target
 
-    # 1. hochfahren (falls nicht schon oben)
+    # 1. aktuelle Position holen
+    # cur_x, cur_y, cur_z, cur_r = bot.get_pose()
+    # print("Aktuelle Position:", bot.get_pose())
+    pose = bot.get_pose()
+
+    cur_x = pose.position.x
+    cur_y = pose.position.y
+    cur_z = pose.position.z
+    cur_r = pose.position.rotation
+
+    # 2. erst senkrecht hoch
+    if cur_z < safe_z:
+        bot.move_to(cur_x, cur_y, safe_z, cur_r, mode=1)
+        sleep(1)
+
+    # 3. XY über safe_z fahren
     bot.move_to(x, y, safe_z, r, mode=1)
     sleep(1)
 
-    # 2. XY Position sicher anfahren (oben)
-    #bot.move_to(x, y, safe_z, r, mode=1)
-    #sleep(1)
-
-    # 3. runter zur Zielhöhe
+    # 4. runter zur Zielhöhe
     bot.move_to(x, y, z, r, mode=1)
     sleep(1)
