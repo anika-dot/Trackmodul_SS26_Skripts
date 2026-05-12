@@ -37,7 +37,7 @@ def on_message(client, userdata, msg):
             time.sleep(0.3)
             print("Color sensor finished scanning") # To Do: Delete print statement
 
-        if rgb == [False, False, True]:
+        if rgb == [False, False, False]:
             color = "blue"
         else:
             color = "other"
