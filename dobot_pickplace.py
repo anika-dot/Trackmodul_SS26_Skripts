@@ -2,17 +2,22 @@ import json
 import time
 import paho.mqtt.client as mqtt
 from dobotapi import Dobot
-from dobot_functions import find_dobot_ports
+from dobot_functions import find_dobot_ports, safe_move
 
-BROKER = "172.20.10.12"
+BROKER = "broker.hivemq.com"
 
 # Connect to dobot 1
 ports = find_dobot_ports()
-dobot1 = Dobot(port=ports[1])
+dobot1 = Dobot(port=ports[0])
 dobot1.connect()
 
 print("Dobot Pick & Place ready")
 
+HOME_POSITION = (209.6999969482422, 0.0, 100.0, 0.0) # given from the dobot
+PICK_POSITION = (230, 85, 30, 55) #checked
+SENSOR_POSITION = (150, 255, 50, 45) #checked
+
+SLEEP_TIME = 1
 
 def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
@@ -20,14 +25,10 @@ def on_message(client, userdata, msg):
     if data.get("command") == "start":
         print("Dobot Pick & Place start task")
 
-        home_position = (185.0, 100.0, 118.0, 57.0) #(225.0, -25.0, 100.0, 22.0)
-        pick_position = (200.0, 150.0, 20.38, 45) #(200.28, 119.57, 20.38, 38.43)
-        sensor_position = (43.84, 240.0, 45.0, 86.45) #(43.84, 222.58, 43.59, 86.45) 
-
         # dobot to home position
         print("Drive to home...")
-        dobot1.move_to(*home_position)
-        time.sleep(1)
+        safe_move(dobot1, HOME_POSITION)
+        time.sleep(SLEEP_TIME)
 
         # start conveyor belt
         dobot1.ir_toggle(enable=True)
@@ -44,38 +45,38 @@ def on_message(client, userdata, msg):
         # gripper opens
         print("Gripper opens...")
         dobot1.gripper.open()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
 
         # arm drives to object
         print("Drive to object...")
-        dobot1.move_to(*pick_position)
-        time.sleep(0.3)
- 
+        safe_move(dobot1, PICK_POSITION)
+        time.sleep(SLEEP_TIME)
+
         # gripper closes
         print("Gripper closes...")
         dobot1.gripper.close()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
         print("Gripper closed")
 
         # put block on color sensor
         print("Arm lifts up...")
-        dobot1.move_to(*sensor_position)
-        time.sleep(0.3)
+        safe_move(dobot1, SENSOR_POSITION)
+        time.sleep(SLEEP_TIME)
 
         # gripper opens
         print("Gripper opens...")
         dobot1.gripper.open()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
 
         # arm back to home
         print("Drive to home...")
-        dobot1.move_to(*home_position)
-        time.sleep(1)
+        safe_move(dobot1, HOME_POSITION)
+        time.sleep(SLEEP_TIME)
 
         # gripper closes
         print("Gripper closes...")
         dobot1.gripper.close()
-        time.sleep(1)
+        time.sleep(SLEEP_TIME)
         print("Gripper closed")
 
         # close connection
@@ -84,7 +85,7 @@ def on_message(client, userdata, msg):
 
         print("Dobot 1 finished task")
 
-        client.publish("dobot/pickplace/status", json.dumps({
+        client.publish("trackmodul_ah_SS26/dobot/pickplace/status", json.dumps({
             "status": "done"
         }), qos=1)
 
@@ -92,6 +93,6 @@ client = mqtt.Client()
 client.on_message = on_message
 
 client.connect(BROKER, 1883)
-client.subscribe("dobot/pickplace/command")
+client.subscribe("trackmodul_ah_SS26/dobot/pickplace/command")
 
 client.loop_forever()
