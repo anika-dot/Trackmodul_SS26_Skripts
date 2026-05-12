@@ -1,26 +1,25 @@
 # Trackmodul_SS26_Skripts
 
-A Python-based automation system for coordinating multiple Dobot robotic arms in an industrial sorting and handling workflow using MQTT messaging protocol.
+A Python-based automation system for coordinating two Dobot robotic arms in an industrial sorting and handling workflow using MQTT messaging protocol. The setup contains a RaspberryPi, two Dobot Magician, a conveyor belt, a light barrier and a color sensor. 
 
 ## 💡 Overview
 
 This project implements a distributed robotic control system featuring:
-- **Central Controller** - Orchestrates the workflow between multiple Dobot robots
+- **Central Controller** - Orchestrates the workflow between two Dobot robots, a conveyor belt, ligth barrier and color sensor
 - **Pick & Place Unit** - Handles item manipulation using a Dobot robot
 - **Color Sensor** - Identifies object colors for sorting decisions
 - **Sorting Unit** - Sorts items based on detected colors (blue vs. other)
 - **MQTT Communication** - Real-time message-based coordination between components
 
-The system processes items through a complete workflow: pick-up → detection → sorting, with event logging and error handling.
+The system processes items through a complete workflow: pick-up → detection → sorting, with event logging and simple error handling.
 
 ## ✨ Features
 
-- **Multi-Robot Orchestration** - Coordinate multiple Dobot arms via MQTT
+- **Multi-Robot Orchestration** - Coordinate two Dobot arms via MQTT
+- **Pick & Place Operations** - Automated manipulation with gripper control
 - **Color-Based Sorting** - Automatic item classification by color detection
 - **Event Logging** - Comprehensive logging of all system operations and timings
-- **Pick & Place Operations** - Automated manipulation with gripper control
-- **Safe Movement** - Protected movement commands with error handling
-- **Conveyor Integration** - Items placed back on conveyor for reprocessing
+- **Safe Movement** - Protected movement commands with simple error handling
 - **State Machine Control** - Robust workflow management with state tracking
 
 ## 👩‍💻 Tech Stack
@@ -28,24 +27,24 @@ The system processes items through a complete workflow: pick-up → detection �
 - **Language**: Python 3
 - **Primary Library**: 
   - `dobotapi` - Dobot robot control
-  - `pydobotplus` - Extended Dobot functionality
+  - `pydobotplus` - Extended Dobot functionality for color sensor
   - `paho-mqtt` - MQTT client for message brokering
   - `pyserial` - Serial communication
   - `pyyaml` - Configuration management
   - `coloredlogs` - Enhanced logging
 
-- **Hardware**: Dobot robotic arms (Dobot Magician variants)
-- **Communication**: MQTT Broker (HiveMQ)
-- **Platforms**: Jupyter Notebooks for development/testing
+- **Hardware**: Dobot Magician with gripper arm, conveyor belt, light barrier and color sensor
+- **Communication**: Public MQTT Broker (HiveMQ)
+- **RaspberryPi**
+- **Platforms**: VisualStudioCode
 
 ## 📦 Getting Started
 
 ### 🚀 Prerequisites
 
 - Python 3.7+
-- Dobot robotic arm(s) with USB connectivity
-- MQTT Broker access (e.g., broker.hivemq.com)
-- Serial port drivers for Dobot communication
+- Dobot Magician with USB connectivity
+- RaspberryPi
 
 ### 🛠️ Installation
 
@@ -68,9 +67,9 @@ The system processes items through a complete workflow: pick-up → detection �
 
 ### 📖 Usage
 
-**Start the central controller** (main orchestration):
+**Initialize robot positions**:
 ```bash
-python controller.py
+python homing_dobot.py
 ```
 
 **Run the pick & place module**:
@@ -89,10 +88,11 @@ python color_scanner.py
 python dobot_sorter.py
 ```
 
-**Initialize robot positions**:
+**Start the central controller** (main orchestration):
 ```bash
-python homing_dobot.py
+python controller.py
 ```
+
 
 **Define custom positions** (interactive):
 ```bash
@@ -102,7 +102,7 @@ jupyter notebook define_positions.ipynb
 ## 🏗️ Project Structure
 
 ```
-├── controller.py                 # Central workflow orchestrator
+├── controller.py                # Central workflow orchestrator
 ├── dobot_sorter.py              # Sorting logic with gripper control
 ├── dobot_pickplace.py           # Pick & place operations
 ├── dobot_functions.py           # Shared Dobot utility functions
@@ -154,6 +154,11 @@ If you encounter any issues while using or setting up the project, please check 
   - Dobot model and firmware version
   - Serial port information
   - MQTT broker status
+
+### Issues with the Dobot positions
+
+You can find a guide to hanlde Dobot positions here: define_positions.ipynb 
+If you encounter problems with the homing position of the Dobot, you can take a look at this notebook: homing_dobot.ipynb. In the guide you will find detailed information how to reset the dobot home position and change it. 
 
 ## 📜 License
 
