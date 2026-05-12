@@ -36,7 +36,7 @@ from dobotmaster.lib.dobot import Dobot
 from serial.tools import list_ports
 
 # Resting (home) position of the Dobot
-resting = (219.4817, 5.5783, 85.0774, 1.4559)
+resting = (219.4817, 20, 85.0774, 1.4559) #(219.4817, 5.20, 85.0774, 1.4559)
 
 def init_and_home_dobot(port, move_to_resting=False):
     try:
@@ -51,7 +51,7 @@ def init_and_home_dobot(port, move_to_resting=False):
         bot.home()
         bot.interface.wait_until_done()
 
-        sleep(3)
+        sleep(1)
 
         return bot
 
@@ -66,12 +66,12 @@ def safe_move(bot, target, safe_z=SAFE_Z):
 
     # 1. hochfahren (falls nicht schon oben)
     bot.move_to(x, y, safe_z, r, mode=1)
-    sleep(3)
+    sleep(1)
 
     # 2. XY Position sicher anfahren (oben)
-    bot.move_to(x, y, safe_z, r, mode=1)
-    sleep(3)
+    #bot.move_to(x, y, safe_z, r, mode=1)
+    #sleep(1)
 
     # 3. runter zur Zielhöhe
     bot.move_to(x, y, z, r, mode=1)
-    sleep(3)
+    sleep(1)

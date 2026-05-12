@@ -70,7 +70,7 @@ pos1 = dobot1.get_pose()
 pos2 = dobot2.get_pose()
 
 # Positionen
-pick_color_sensor_sorter = (160, -150, 50, 5)
+pick_color_sensor_sorter = (150, -150, 50, 5)
 pick_conveyor_belt_pick_place = (100, 150, 60, 0)
 
 safe_move(dobot1, pick_color_sensor_sorter)

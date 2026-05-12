@@ -3,88 +3,100 @@ import time
 import paho.mqtt.client as mqtt
 from dobotapi import Dobot
 from dobot_functions import find_dobot_ports
+from event_logger import EventLogger
 
 BROKER = "broker.hivemq.com"
 
+log = EventLogger("pickplace")
+
 # Connect to dobot 1
 ports = find_dobot_ports()
-dobot1 = Dobot(port=ports[1])
+dobot1 = Dobot(port=ports[0])
 dobot1.connect()
-
-print("Dobot Pick & Place ready")
-
-HOME_POSITION = (185.0, 100.0, 118.0, 90) #(225.0, -25.0, 100.0, 22.0)
-PICK_POSITION = (186.42, 152.0, 29.169, 90) #(200.28, 119.57, 20.38, 38.43)
-SENSOR_POSITION = (19.272, 233.825, 46.538, 90) #(43.84, 222.58, 43.59, 86.45)
-
-SLEEP_TIME = 1.5
-
+log.info("dobot_connected", port=ports[0])
+print("Dobot Pick & Place ready") # To Do: Delete print statement
 
 def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
 
     if data.get("command") == "start":
-        print("Dobot Pick & Place start task")
+        print("Dobot Pick & Place start task") # To Do: Delete print statement
+        log.info("task_received", command="start")
+
+        home_position = (209.6999969482422, 0.0, 100.0, 0.0) # given from the dobot
+        pick_position = (230, 85, 30, 55) #checked
+        sensor_position = (150, 255, 50, 45) #checked
 
         # dobot to home position
-        print("Drive to home...")
-        dobot1.move_to(*HOME_POSITION)
-        time.sleep(SLEEP_TIME)
+        with log.timed("move_to_home_initial"):
+            print("Drive to home...") # To Do: Delete print statement
+            dobot1.move_to(*home_position)
+            time.sleep(1)
 
         # start conveyor belt
         dobot1.ir_toggle(enable=True)
-        print("Conveyor belt running")
-        dobot1.conveyor_belt.move(speed=0.5)
 
-        # wait until object is detected
-        while dobot1.get_ir() == False:
-            time.sleep(SLEEP_TIME)
+        with log.timed("conveyor_belt_running_until_object_detected"):
+            print("Conveyor belt running") # To Do: Delete print statement
+            dobot1.conveyor_belt.move(speed=0.5)
+            # wait until object is detected
+            while dobot1.get_ir() == False:
+                time.sleep(0.1)
 
-        print("Object detected - STOP")
-        dobot1.conveyor_belt.idle()
+            print("Object detected - STOP") # To Do: Delete print statement
+            dobot1.conveyor_belt.idle()
+        log.info("object_detected_by_ir_sensor")
 
         # gripper opens
-        print("Gripper opens...")
-        dobot1.gripper.open()
-        time.sleep(SLEEP_TIME)
+        with log.timed("gripper_open"):
+            print("Gripper opens...") # To Do: Delete print statement
+            dobot1.gripper.open()
+            time.sleep(0.3)
 
         # arm drives to object
-        print("Drive to object...")
-        dobot1.move_to(*PICK_POSITION)
-        time.sleep(SLEEP_TIME)
+        with log.timed("move_to_pick"):
+            print("Drive to object...") # To Do: Delete print statement
+            dobot1.move_to(*pick_position)
+            time.sleep(0.3)
  
         # gripper closes
-        print("Gripper closes...")
-        dobot1.gripper.close()
-        time.sleep(SLEEP_TIME)
-        print("Gripper closed")
+        with log.timed("gripper_close"):
+            print("Gripper closes...") # To Do: Delete print statement
+            dobot1.gripper.close()
+            time.sleep(0.3)
+            print("Gripper closed") # To Do: Delete print statement
 
         # put block on color sensor
-        print("Arm lifts up...")
-        dobot1.move_to(*SENSOR_POSITION)
-        time.sleep(SLEEP_TIME)
+        with log.timed("move_to_color_sensor"):
+            print("Arm lifts up...") # To Do: Delete print statement
+            dobot1.move_to(*sensor_position)
+            time.sleep(0.3)
 
         # gripper opens
-        print("Gripper opens...")
-        dobot1.gripper.open()
-        time.sleep(SLEEP_TIME)
+        with log.timed("gripper_open"):
+            print("Gripper opens...") # To Do: Delete print statement
+            dobot1.gripper.open()
+            time.sleep(0.3)
 
         # arm back to home
-        print("Drive to home...")
-        dobot1.move_to(*HOME_POSITION)
-        time.sleep(SLEEP_TIME)
+        with log.timed("move_to_home_final"):
+            print("Drive to home...") # To Do: Delete print statement
+            dobot1.move_to(*home_position)
+            time.sleep(1)
 
         # gripper closes
-        print("Gripper closes...")
-        dobot1.gripper.close()
-        time.sleep(SLEEP_TIME)
-        print("Gripper closed")
+        with log.timed("gripper_close"):
+            print("Gripper closes...") # To Do: Delete print statement
+            dobot1.gripper.close()
+            time.sleep(1)
+            print("Gripper closed") # To Do: Delete print statement
 
         # close connection
         dobot1.close()
-        print("Fertig")
+        print("Fertig") # To Do: Delete print statement
+        log.info("task_finished")
 
-        print("Dobot 1 finished task")
+        print("Dobot 1 finished task") # To Do: Delete print statement
 
         client.publish("trackmodul_ah_SS26/dobot/pickplace/status", json.dumps({
             "status": "done"
