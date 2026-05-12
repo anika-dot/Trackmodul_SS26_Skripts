@@ -2,16 +2,21 @@ import json
 import time
 import paho.mqtt.client as mqtt
 from dobotapi import Dobot
-from dobot_functions import find_dobot_ports
+from dobot_functions import find_dobot_ports, safe_move
 
 BROKER = "broker.hivemq.com"
 
 # Connect to dobot 1
 ports = find_dobot_ports()
-dobot1 = Dobot(port=ports[1])
+dobot1 = Dobot(port=ports[0])
 dobot1.connect()
 
 print("Dobot Pick & Place ready")
+
+HOME_POSITION = (209.6999969482422, 0.0, 100.0, 0.0) # given from the dobot
+PICK_POSITION = (230, 85, 30, 55) #checked
+SENSOR_POSITION = (150, 255, 50, 45) #checked
+
 
 
 def on_message(client, userdata, msg):
@@ -20,13 +25,10 @@ def on_message(client, userdata, msg):
     if data.get("command") == "start":
         print("Dobot Pick & Place start task")
 
-        home_position = (185.0, 100.0, 118.0, 57.0) #(225.0, -25.0, 100.0, 22.0)
-        pick_position = (200.0, 150.0, 20.38, 45) #(200.28, 119.57, 20.38, 38.43)
-        sensor_position = (43.84, 240.0, 45.0, 86.45) #(43.84, 222.58, 43.59, 86.45) 
-
         # dobot to home position
         print("Drive to home...")
-        dobot1.move_to(*home_position)
+        safe_move(dobot1, HOME_POSITION)
+        #dobot1.move_to(*HOME_POSITION)
         time.sleep(1)
 
         # start conveyor belt
@@ -48,7 +50,8 @@ def on_message(client, userdata, msg):
 
         # arm drives to object
         print("Drive to object...")
-        dobot1.move_to(*pick_position)
+        safe_move(dobot1, PICK_POSITION)
+        # dobot1.move_to(*PICK_POSITION)
         time.sleep(0.3)
  
         # gripper closes
@@ -59,7 +62,8 @@ def on_message(client, userdata, msg):
 
         # put block on color sensor
         print("Arm lifts up...")
-        dobot1.move_to(*sensor_position)
+        safe_move(dobot1, SENSOR_POSITION)
+        # dobot1.move_to(*SENSOR_POSITION)
         time.sleep(0.3)
 
         # gripper opens
@@ -69,7 +73,8 @@ def on_message(client, userdata, msg):
 
         # arm back to home
         print("Drive to home...")
-        dobot1.move_to(*home_position)
+        safe_move(dobot1, HOME_POSITION)
+        # dobot1.move_to(*HOME_POSITION)
         time.sleep(1)
 
         # gripper closes

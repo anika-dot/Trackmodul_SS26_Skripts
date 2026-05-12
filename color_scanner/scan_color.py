@@ -31,8 +31,9 @@ def on_message(client, userdata, msg):
         rgb = color_sensor.get_color()
         time.sleep(0.3)
         print("Color sensor finished scanning")
+        print(f"RGB values: {rgb}")
 
-        if rgb == [False, False, True]:
+        if rgb == [False, False, False]:
             color = "blue"
         else:
             color = "other"

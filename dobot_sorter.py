@@ -4,21 +4,23 @@ import time
 from turtle import color
 import paho.mqtt.client as mqtt
 from dobotapi import Dobot
-from dobot_functions import find_dobot_ports
+from dobot_functions import find_dobot_ports, safe_move
 
 BROKER = "broker.hivemq.com"
 
 # Connect to dobot 2
 ports = find_dobot_ports()
-dobot2 = Dobot(port=ports[0])
+dobot2 = Dobot(port=ports[1])
 dobot2.connect()
 
 print("Dobot Sorter ready")
 
-home_position = (154.84, 25.89, 38.79, 18.44) #(154.84, 25.89, 38.79, 18.44) #(225.0, -25.0, 100.0, 22.0)
-sensor_position = (150.0, 45.0, 45.0, 40.0) #(148.35, -25.89, 38.79, 18.44) #(200.0, 200.0, 80.0, 25.0)
-conveyor_position = (233.91, -13.74, 39.27, 24.97)
-throw_position = (316.00, 8.91, 43.16, 29.95)
+HOME_POSITION = (209.6999969482422, 0.0, 100.0, 0.0) # given from the dobot
+SENSOR_POSITION = (150, -190, 50, 65) # checked
+CONVEYOR_POSITION = (230, -50, 50, 0) # checked
+THROW_POSITION = (250, 100, 50, 0) # checked
+
+SLEEP_TIME = 1.5
 
 def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
@@ -28,29 +30,32 @@ def on_message(client, userdata, msg):
 
         # dobot to home position
         print("Drive to home...")
-        dobot2.move_to(*home_position)
-        time.sleep(0.3)
+        safe_move(dobot2, HOME_POSITION)
+        # dobot2.move_to(*HOME_POSITION)
+        time.sleep(SLEEP_TIME)
 
         # gripper opens
         print("Gripper opens...")
         dobot2.gripper.open()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
 
         # dobot to color sensor position
         print("Arm to color sensor...")
-        dobot2.move_to(*sensor_position)
-        time.sleep(0.3)
+        safe_move(dobot2, SENSOR_POSITION)
+        # dobot2.move_to(*SENSOR_POSITION)
+        time.sleep(SLEEP_TIME)
 
         # gripper closes
         print("Gripper closes...")
         dobot2.gripper.close()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
         print("Gripper closed")
 
         # throw block away
         print("Color is not blue, throwing...")
-        dobot2.move_to(*throw_position)
-        time.sleep(0.3)
+        safe_move(dobot2, THROW_POSITION)
+        # dobot2.move_to(*THROW_POSITION)
+        time.sleep(SLEEP_TIME)
         dobot2.gripper.open()
         print("Block placed throwing position")
 
@@ -61,13 +66,14 @@ def on_message(client, userdata, msg):
 
         # arm back to home
         print("Drive to home...")
-        dobot2.move_to(*home_position)
-        time.sleep(0.3)
+        safe_move(dobot2, HOME_POSITION)
+        # dobot2.move_to(*HOME_POSITION)
+        time.sleep(SLEEP_TIME)
 
         # gripper closes
         print("Gripper closes...")
         dobot2.gripper.close()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
         print("Gripper closed")
 
         # close connection
@@ -84,28 +90,30 @@ def on_message(client, userdata, msg):
 
         # dobot to home position
         print("Drive to home...")
-        dobot2.move_to(*home_position)
-        time.sleep(0.3)
+        safe_move(dobot2, HOME_POSITION)
+        # dobot2.move_to(*HOME_POSITION)
+        time.sleep(SLEEP_TIME)
 
         # gripper opens
         print("Gripper opens...")
         dobot2.gripper.open()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
 
         # dobot to color sensor position
         print("Arm to color sensor...")
-        dobot2.move_to(*sensor_position)
-        time.sleep(0.3)
+        safe_move(dobot2, SENSOR_POSITION)
+        #dobot2.move_to(*SENSOR_POSITION)
+        time.sleep(SLEEP_TIME)
 
         # gripper closes
         print("Gripper closes...")
         dobot2.gripper.close()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
         print("Gripper closed")
 
         # but block back on conveyor belt
-        dobot2.move_to(*conveyor_position)
-        time.sleep(0.3)
+        dobot2.move_to(*CONVEYOR_POSITION)
+        time.sleep(SLEEP_TIME)
         dobot2.gripper.open()
         print("Block placed on the conveyor belt")
 
@@ -116,13 +124,14 @@ def on_message(client, userdata, msg):
 
         # arm back to home
         print("Drive to home...")
-        dobot2.move_to(*home_position)
-        time.sleep(0.3)
+        safe_move(dobot2, HOME_POSITION)
+        #dobot2.move_to(*HOME_POSITION)
+        time.sleep(SLEEP_TIME)
 
         # gripper closes
         print("Gripper closes...")
         dobot2.gripper.close()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
         print("Gripper closed")
 
         # close connection
