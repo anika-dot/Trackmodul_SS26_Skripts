@@ -17,7 +17,7 @@ HOME_POSITION = (209.6999969482422, 0.0, 100.0, 0.0) # given from the dobot
 PICK_POSITION = (230, 85, 30, 55) #checked
 SENSOR_POSITION = (150, 255, 50, 45) #checked
 
-
+SLEEP_TIME = 1
 
 def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
@@ -28,8 +28,7 @@ def on_message(client, userdata, msg):
         # dobot to home position
         print("Drive to home...")
         safe_move(dobot1, HOME_POSITION)
-        #dobot1.move_to(*HOME_POSITION)
-        time.sleep(1)
+        time.sleep(SLEEP_TIME)
 
         # start conveyor belt
         dobot1.ir_toggle(enable=True)
@@ -46,41 +45,38 @@ def on_message(client, userdata, msg):
         # gripper opens
         print("Gripper opens...")
         dobot1.gripper.open()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
 
         # arm drives to object
         print("Drive to object...")
         safe_move(dobot1, PICK_POSITION)
-        # dobot1.move_to(*PICK_POSITION)
-        time.sleep(0.3)
- 
+        time.sleep(SLEEP_TIME)
+
         # gripper closes
         print("Gripper closes...")
         dobot1.gripper.close()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
         print("Gripper closed")
 
         # put block on color sensor
         print("Arm lifts up...")
         safe_move(dobot1, SENSOR_POSITION)
-        # dobot1.move_to(*SENSOR_POSITION)
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
 
         # gripper opens
         print("Gripper opens...")
         dobot1.gripper.open()
-        time.sleep(0.3)
+        time.sleep(SLEEP_TIME)
 
         # arm back to home
         print("Drive to home...")
         safe_move(dobot1, HOME_POSITION)
-        # dobot1.move_to(*HOME_POSITION)
-        time.sleep(1)
+        time.sleep(SLEEP_TIME)
 
         # gripper closes
         print("Gripper closes...")
         dobot1.gripper.close()
-        time.sleep(1)
+        time.sleep(SLEEP_TIME)
         print("Gripper closed")
 
         # close connection
