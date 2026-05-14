@@ -1,6 +1,8 @@
-# beide Dobots subscriber, für die Rückmeldung auch als publisher
-
-# Server = zentrales Skript, als publisher
+'''
+This module acts as the controller for the whole process.
+Both dobots and the color scanner act as subscriber to those topics and
+the actions for them are handled in separate scripts.
+'''
 
 import time
 import json
@@ -13,10 +15,13 @@ state = "INIT"
 log = EventLogger("controller")
 
 def on_message(client, userdata, msg):
+    '''
+    Function to orchestrate the whole process with the involved components.
+    '''
     global state
 
     data = json.loads(msg.payload.decode())
-    topic = msg.topic 
+    topic = msg.topic
 
     print(f"[RECV] {topic} -> {data}")
     log.info("mqtt_received", topic=topic, payload=data)
@@ -50,13 +55,19 @@ def on_message(client, userdata, msg):
         log.end("sorter_total")
         print("Finished all tasks") # To Do: Delete print statement
         log.info("run_finished")
-        state = "DONE"
+        #state = "DONE" # To Do: Delete
+        ## Start the new process # To Do: Delete
+        log.start("pickplace_total")
+        client.publish("trackmodul_ah_SS26/dobot/pickplace/command", json.dumps({"command": "start"}))
+        state = "WAIT_D_pickplace"
+        
 
 client = mqtt.Client()
 client.on_message = on_message
 
 client.connect(BROKER, 1883)
 client.subscribe("trackmodul_ah_SS26/dobot/+/status")
+# zusätzlicher Subscribe notwendig???? (pickplace???)
 
 client.loop_start()
 
@@ -68,5 +79,14 @@ log.start("pickplace_total")
 client.publish("trackmodul_ah_SS26/dobot/pickplace/command", json.dumps({"command": "start"}))
 state = "WAIT_D_pickplace"
 
-while state != "DONE":
-    time.sleep(1)
+# while state != "DONE": # To Do: Delete
+#     time.sleep(1) # To Do: Delete
+
+# Endlosschleife - läuft bis manuell gestoppt (Ctrl+C)
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("Process stopped by user")
+    client.loop_stop()
+    client.disconnect()

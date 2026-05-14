@@ -94,7 +94,7 @@ def on_message(client, userdata, msg):
             print("Gripper closed") # To Do: Delete print statement
 
         # close connection
-        dobot1.close()
+        # dobot1.close() # To Do: Delete
         print("Fertig") # To Do: Delete print statement
         log.info("task_finished")
 
@@ -104,10 +104,21 @@ def on_message(client, userdata, msg):
             "status": "done"
         }), qos=1)
 
+# Sauberes Beenden bei Ctrl+C # To Do: Delete
+def cleanup():
+    dobot1.close()
+    print("Dobot connection closed")
+
 client = mqtt.Client()
 client.on_message = on_message
 
 client.connect(BROKER, 1883)
 client.subscribe("trackmodul_ah_SS26/dobot/pickplace/command")
 
-client.loop_forever()
+# client.loop_forever() # To Do: Delete
+
+try:
+    client.loop_forever()
+except KeyboardInterrupt:
+    cleanup()
+    client.disconnect()
