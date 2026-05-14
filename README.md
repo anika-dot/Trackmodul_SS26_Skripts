@@ -32,19 +32,24 @@ The system processes items through a complete workflow: pick-up → detection �
   - `pyserial` - Serial communication
   - `pyyaml` - Configuration management
   - `coloredlogs` - Enhanced logging
-
-- **Hardware**: Dobot Magician with gripper arm, conveyor belt, light barrier and color sensor
 - **Communication**: Public MQTT Broker (HiveMQ)
-- **RaspberryPi**
 - **Platforms**: VisualStudioCode
+- **Hardware**:
+  - Dobot Magician with gripper arm, conveyor belt, light barrier and color sensor
+  - RaspberryPi
+
+### Set-up
+
+- Dobot "Pickplace" with conveyor belt and light barrier
+- Dobot "Sorter" with color sensor
+- both Dobots connected to the same RaspberryPi
 
 ## 📦 Getting Started
 
 ### 🚀 Prerequisites
 
 - Python 3.7+
-- Dobot Magician with USB connectivity
-- RaspberryPi
+- Hardware
 
 ### 🛠️ Installation
 
