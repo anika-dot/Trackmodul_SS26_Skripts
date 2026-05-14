@@ -1,6 +1,6 @@
 # Trackmodul_SS26_Skripts
 
-A Python-based automation system for coordinating two Dobot robotic arms in an industrial sorting and handling workflow using MQTT messaging protocol. The setup contains a RaspberryPi, two Dobot Magician, a conveyor belt, a light barrier and a color sensor. 
+A Python-based automation system for coordinating two Dobot robotic arms in a sorting and handling workflow using MQTT messaging protocol. The setup contains a RaspberryPi, two Dobot Magician, a conveyor belt, a light barrier and a color sensor. 
 
 ## 💡 Overview
 
@@ -117,6 +117,7 @@ jupyter notebook define_positions.ipynb
 ├── define_positions.ipynb       # Position definition tool
 ├── color_scanner/               # Color detection module
 │   └── requirements.txt
+├── logs/                        # Log files
 ├── dobotmaster/                 # Dobot API integration layer
 ├── requirements.txt             # Python dependencies
 └── README.md
