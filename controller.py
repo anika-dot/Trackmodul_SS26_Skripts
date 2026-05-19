@@ -28,7 +28,6 @@ def on_message(client, userdata, msg):
 
     if topic == "trackmodul_ah_SS26/dobot/pickplace/status" and state == "WAIT_D_pickplace":
         log.end("pickplace_total")
-        print("Start Color Sensor") # To Do: Delete print statement
         log.start("colorsensor_total")
         client.publish("trackmodul_ah_SS26/dobot/colorsensor/command", json.dumps({"command": "scanning"}))
         state = "WAIT_D_color_sensor"
@@ -41,11 +40,9 @@ def on_message(client, userdata, msg):
         log.info("color_detected", color=detected_color)
 
         if detected_color == "blue":
-            print("Start Dobot Sorter: BLUE") # To Do: Delete print statement
             log.start("sorter_total", color=detected_color)
             client.publish("trackmodul_ah_SS26/dobot/sorter/command", json.dumps({"command": "sorting blue"}))
         else:
-            print("Start Dobot Sorter: OTHER") # To Do: Delete print statement
             log.start("sorter_total", color=detected_color)
             client.publish("trackmodul_ah_SS26/dobot/sorter/command", json.dumps({"command": "sorting other"}))
         
@@ -53,10 +50,8 @@ def on_message(client, userdata, msg):
 
     elif topic == "trackmodul_ah_SS26/dobot/sorter/status" and state == "WAIT_D_Sorter":
         log.end("sorter_total")
-        print("Finished all tasks") # To Do: Delete print statement
         log.info("run_finished")
-        #state = "DONE" # To Do: Delete
-        ## Start the new process # To Do: Delete
+        # Start the new process 
         log.start("pickplace_total")
         client.publish("trackmodul_ah_SS26/dobot/pickplace/command", json.dumps({"command": "start"}))
         state = "WAIT_D_pickplace"
@@ -72,16 +67,12 @@ client.loop_start()
 
 time.sleep(1)
 
-print("Start Dobot Pick & Place") # To Do: Delete print statement
 log.info("run_started")
 log.start("pickplace_total")
 client.publish("trackmodul_ah_SS26/dobot/pickplace/command", json.dumps({"command": "start"}))
 state = "WAIT_D_pickplace"
 
-# while state != "DONE": # To Do: Delete
-#     time.sleep(1) # To Do: Delete
-
-# Endlosschleife - läuft bis manuell gestoppt (Ctrl+C)
+# loop until user interrupts manually
 try:
     while True:
         time.sleep(1)

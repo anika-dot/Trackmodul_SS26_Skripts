@@ -1,3 +1,7 @@
+'''
+This module contains all process information for Dobot "Pickplace"
+'''
+
 import json
 import time
 import paho.mqtt.client as mqtt
@@ -13,18 +17,18 @@ log = EventLogger("pickplace")
 ports = find_dobot_ports()
 dobot1 = Dobot(port=ports[0])
 dobot1.connect()
-log.info("dobot_connected", port=ports[1])
+log.info("dobot_connected", port=ports[0])
 
 HOME_POSITION = (209.6999969482422, 0.0, 100.0, 0.0)
 PICK_POSITION = (230, 85, 30, 55) 
 SENSOR_POSITION = (150, 255, 50, 45)
 
-SLEEP_TIME = 1
+SLEEP_TIME = 1.5
 
 def on_message(client, userdata, msg):
     '''
-    function to define the process for the dobot pickplace. 
-    runs conveyor belt, picks blocks from it and places them on the color sensor.
+    Function to define the process for the dobot pickplace. 
+    Runs conveyor belt, picks blocks from it and places them on the color sensor.
     '''
     data = json.loads(msg.payload.decode())
 
@@ -103,6 +107,7 @@ client.on_message = on_message
 client.connect(BROKER, 1883)
 client.subscribe("trackmodul_ah_SS26/dobot/pickplace/command")
 
+# loop until user interrupts manually
 try:
     client.loop_forever()
 except KeyboardInterrupt:

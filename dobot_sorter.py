@@ -1,3 +1,7 @@
+'''
+This module contains all process information for Dobot "Sorter"
+'''
+
 import json
 import time
 from turtle import color
@@ -13,7 +17,7 @@ log = EventLogger("sorter")
 ports = find_dobot_ports()
 dobot2 = Dobot(port=ports[1])
 dobot2.connect()
-log.info("dobot_connected", port=ports[0])
+log.info("dobot_connected", port=ports[1])
 
 HOME_POSITION = (209.6999969482422, 0.0, 100.0, 0.0)
 SENSOR_POSITION = (150, -190, 50, 65)
@@ -24,7 +28,7 @@ SLEEP_TIME = 1.5
 
 def on_message(client, userdata, msg):
     '''
-    function to define the process for the dobot sorter. 
+    Function to define the process for the dobot sorter. 
     2 options, depending on the feedback of the color sensor (blue or other color)
     '''
     data = json.loads(msg.payload.decode())
@@ -123,7 +127,7 @@ def on_message(client, userdata, msg):
 
 def cleanup():
     '''
-    function to close connection manually
+    Function to close connection manually
     '''
     dobot2.close()
     print("Dobot connection closed")
@@ -134,6 +138,7 @@ client.on_message = on_message
 client.connect(BROKER, 1883)
 client.subscribe("trackmodul_ah_SS26/dobot/sorter/command")
 
+# loop until user interrupts manually
 try:
     client.loop_forever()
 except KeyboardInterrupt:

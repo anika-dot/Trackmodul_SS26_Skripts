@@ -1,3 +1,7 @@
+'''
+This module contains the process information for the color scanner.
+'''
+
 import json
 import time
 from turtle import color
@@ -13,13 +17,13 @@ log = EventLogger("color_scanner")
 
 # Connect to color sensor
 ports = find_dobot_ports()
-color_sensor = Dobot(port=ports[0])
-log.info("color_sensor_connected", port=ports[0])
+color_sensor = Dobot(port=ports[1])
+log.info("color_sensor_connected", port=ports[1])
 
 def on_message(client, userdata, msg):
     '''
-    funciton to define process for color scanner.
-    scans color and sends information back to the controller.
+    Function to define process for color scanner.
+    Scans color and sends information back to the controller.
     '''
     data = json.loads(msg.payload.decode())
 
@@ -30,7 +34,7 @@ def on_message(client, userdata, msg):
 
         color_sensor.set_color(True, VERSION)
 
-        # Reading color sensor...
+        # Reading color sensor
         with log.timed("color_scanning"):
             color_sensor.get_color()
             rgb = color_sensor.get_color()
