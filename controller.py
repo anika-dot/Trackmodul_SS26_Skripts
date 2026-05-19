@@ -1,6 +1,8 @@
-# beide Dobots subscriber, für die Rückmeldung auch als publisher
-
-# Server = zentrales Skript, als publisher
+'''
+This module acts as the controller for the whole process.
+Both dobots and the color scanner act as subscriber to those topics and
+the actions for them are handled in separate scripts.
+'''
 
 import time
 import json
@@ -13,17 +15,19 @@ state = "INIT"
 log = EventLogger("controller")
 
 def on_message(client, userdata, msg):
+    '''
+    Function to orchestrate the whole process with the involved components.
+    '''
     global state
 
     data = json.loads(msg.payload.decode())
-    topic = msg.topic 
+    topic = msg.topic
 
     print(f"[RECV] {topic} -> {data}")
     log.info("mqtt_received", topic=topic, payload=data)
 
     if topic == "trackmodul_ah_SS26/dobot/pickplace/status" and state == "WAIT_D_pickplace":
         log.end("pickplace_total")
-        print("Start Color Sensor") # To Do: Delete print statement
         log.start("colorsensor_total")
         client.publish("trackmodul_ah_SS26/dobot/colorsensor/command", json.dumps({"command": "scanning"}))
         state = "WAIT_D_color_sensor"
@@ -36,11 +40,9 @@ def on_message(client, userdata, msg):
         log.info("color_detected", color=detected_color)
 
         if detected_color == "blue":
-            print("Start Dobot Sorter: BLUE") # To Do: Delete print statement
             log.start("sorter_total", color=detected_color)
             client.publish("trackmodul_ah_SS26/dobot/sorter/command", json.dumps({"command": "sorting blue"}))
         else:
-            print("Start Dobot Sorter: OTHER") # To Do: Delete print statement
             log.start("sorter_total", color=detected_color)
             client.publish("trackmodul_ah_SS26/dobot/sorter/command", json.dumps({"command": "sorting other"}))
         
@@ -48,9 +50,12 @@ def on_message(client, userdata, msg):
 
     elif topic == "trackmodul_ah_SS26/dobot/sorter/status" and state == "WAIT_D_Sorter":
         log.end("sorter_total")
-        print("Finished all tasks") # To Do: Delete print statement
         log.info("run_finished")
-        state = "DONE"
+        # Start the new process 
+        log.start("pickplace_total")
+        client.publish("trackmodul_ah_SS26/dobot/pickplace/command", json.dumps({"command": "start"}))
+        state = "WAIT_D_pickplace"
+        
 
 client = mqtt.Client()
 client.on_message = on_message
@@ -62,11 +67,16 @@ client.loop_start()
 
 time.sleep(1)
 
-print("Start Dobot Pick & Place") # To Do: Delete print statement
 log.info("run_started")
 log.start("pickplace_total")
 client.publish("trackmodul_ah_SS26/dobot/pickplace/command", json.dumps({"command": "start"}))
 state = "WAIT_D_pickplace"
 
-while state != "DONE":
-    time.sleep(1)
+# loop until user interrupts manually
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("Process stopped by user")
+    client.loop_stop()
+    client.disconnect()

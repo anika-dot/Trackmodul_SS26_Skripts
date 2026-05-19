@@ -9,7 +9,7 @@ from pydobotplus import Dobot
 
 # Connect to color sensor
 ports = find_dobot_ports()
-color_sensor = Dobot(port=ports[0])
+color_sensor = Dobot(port=ports[1])
 
 print("Color sensor ready")
 
@@ -26,6 +26,7 @@ color_sensor.get_color()
 rgb = color_sensor.get_color()
 time.sleep(0.3)
 print("Color sensor finished scanning")
+print(rgb)
 
 if rgb == [False, False, True]:
     color = "blue"

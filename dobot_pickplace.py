@@ -1,3 +1,7 @@
+'''
+This module contains all process information for Dobot "Pickplace"
+'''
+
 import json
 import time
 import paho.mqtt.client as mqtt
@@ -13,25 +17,26 @@ log = EventLogger("pickplace")
 ports = find_dobot_ports()
 dobot1 = Dobot(port=ports[0])
 dobot1.connect()
-log.info("dobot_connected", port=ports[1])
-print("Dobot Pick & Place ready") # To Do: Delete print statement
+log.info("dobot_connected", port=ports[0])
 
-HOME_POSITION = (209.6999969482422, 0.0, 100.0, 0.0) # given from the dobot
-PICK_POSITION = (230, 85, 30, 55) #checked
-SENSOR_POSITION = (150, 255, 50, 45) #checked
+HOME_POSITION = (209.6999969482422, 0.0, 100.0, 0.0)
+PICK_POSITION = (230, 85, 30, 55) 
+SENSOR_POSITION = (150, 255, 50, 45)
 
-SLEEP_TIME = 1
+SLEEP_TIME = 1.5
 
 def on_message(client, userdata, msg):
+    '''
+    Function to define the process for the dobot pickplace. 
+    Runs conveyor belt, picks blocks from it and places them on the color sensor.
+    '''
     data = json.loads(msg.payload.decode())
 
     if data.get("command") == "start":
-        print("Dobot Pick & Place start task") # To Do: Delete print statement
         log.info("task_received", command="start")
 
         # dobot to home position
         with log.timed("move_to_home_initial"):
-            print("Drive to home...") # To Do: Delete print statement
             safe_move(dobot1, HOME_POSITION)
             time.sleep(SLEEP_TIME)
 
@@ -39,70 +44,62 @@ def on_message(client, userdata, msg):
         dobot1.ir_toggle(enable=True)
 
         with log.timed("conveyor_belt_running_until_object_detected"):
-            print("Conveyor belt running") # To Do: Delete print statement
             dobot1.conveyor_belt.move(speed=0.5)
             # wait until object is detected
             while dobot1.get_ir() == False:
                 time.sleep(0.1)
 
-            print("Object detected - STOP") # To Do: Delete print statement
             dobot1.conveyor_belt.idle()
         log.info("object_detected_by_ir_sensor")
 
         # gripper opens
         with log.timed("gripper_open"):
-            print("Gripper opens...") # To Do: Delete print statement
             dobot1.gripper.open()
             time.sleep(SLEEP_TIME)
 
         # arm drives to object
         with log.timed("move_to_pick"):
-            print("Drive to object...") # To Do: Delete print statement
             safe_move(dobot1, PICK_POSITION)
             time.sleep(SLEEP_TIME)
  
         # gripper closes
         with log.timed("gripper_close"):
-            print("Gripper closes...") # To Do: Delete print statement
             dobot1.gripper.close()
             time.sleep(SLEEP_TIME)
-            print("Gripper closed") # To Do: Delete print statement
 
         # put block on color sensor
         with log.timed("move_to_color_sensor"):
-            print("Arm lifts up...") # To Do: Delete print statement
             safe_move(dobot1, SENSOR_POSITION)
             time.sleep(SLEEP_TIME)
 
         # gripper opens
         with log.timed("gripper_open"):
-            print("Gripper opens...") # To Do: Delete print statement
             dobot1.gripper.open()
             time.sleep(SLEEP_TIME)
 
         # arm back to home
         with log.timed("move_to_home_final"):
-            print("Drive to home...") # To Do: Delete print statement
             safe_move(dobot1, HOME_POSITION)
             time.sleep(SLEEP_TIME)
 
         # gripper closes
         with log.timed("gripper_close"):
-            print("Gripper closes...") # To Do: Delete print statement
             dobot1.gripper.close()
             time.sleep(SLEEP_TIME)
-            print("Gripper closed") # To Do: Delete print statement
 
-        # close connection
-        dobot1.close()
-        print("Fertig") # To Do: Delete print statement
+        # finish pickplace
         log.info("task_finished")
-
-        print("Dobot 1 finished task") # To Do: Delete print statement
 
         client.publish("trackmodul_ah_SS26/dobot/pickplace/status", json.dumps({
             "status": "done"
         }), qos=1)
+
+def cleanup():
+    '''
+    function to close connection manually
+    '''
+    dobot1.close()
+    print("Dobot connection closed")
 
 client = mqtt.Client()
 client.on_message = on_message
@@ -110,4 +107,9 @@ client.on_message = on_message
 client.connect(BROKER, 1883)
 client.subscribe("trackmodul_ah_SS26/dobot/pickplace/command")
 
-client.loop_forever()
+# loop until user interrupts manually
+try:
+    client.loop_forever()
+except KeyboardInterrupt:
+    cleanup()
+    client.disconnect()
