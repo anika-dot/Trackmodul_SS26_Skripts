@@ -51,7 +51,7 @@ def on_message(client, userdata, msg):
     elif topic == "trackmodul_ah_SS26/dobot/sorter/status" and state == "WAIT_D_Sorter":
         log.end("sorter_total")
         log.info("run_finished")
-        # Start the new process 
+        # Start the new process immediately after finishing the current one
         log.start("pickplace_total")
         client.publish("trackmodul_ah_SS26/dobot/pickplace/command", json.dumps({"command": "start"}))
         state = "WAIT_D_pickplace"
