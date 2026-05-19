@@ -67,7 +67,6 @@ client.on_message = on_message
 
 client.connect(BROKER, 1883)
 client.subscribe("trackmodul_ah_SS26/dobot/+/status")
-# zusätzlicher Subscribe notwendig???? (pickplace???)
 
 client.loop_start()
 

@@ -1,0 +1,28 @@
+{"ts": 1779171858.965689, "ts_iso": "2026-05-19T08:24:18.965", "component": "color_scanner", "event": "logger_started"}
+{"ts": 1779171859.0225444, "ts_iso": "2026-05-19T08:24:19.022", "component": "color_scanner", "level": "INFO", "event": "color_sensor_connected", "port": "/dev/ttyACM1"}
+{"ts": 1779171909.9808948, "ts_iso": "2026-05-19T08:25:09.980", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1779171909.9855266, "ts_iso": "2026-05-19T08:25:09.985", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1779171910.2949686, "ts_iso": "2026-05-19T08:25:10.294", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.309434175491333, "status": "ok"}
+{"ts": 1779171910.2956119, "ts_iso": "2026-05-19T08:25:10.295", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
+{"ts": 1779172008.2347298, "ts_iso": "2026-05-19T08:26:48.234", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1779172008.2436116, "ts_iso": "2026-05-19T08:26:48.243", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1779172008.5538068, "ts_iso": "2026-05-19T08:26:48.553", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.3101921081542969, "status": "ok"}
+{"ts": 1779172008.5541058, "ts_iso": "2026-05-19T08:26:48.554", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
+{"ts": 1779172320.4730217, "ts_iso": "2026-05-19T08:32:00.473", "component": "color_scanner", "event": "logger_started"}
+{"ts": 1779172320.5292792, "ts_iso": "2026-05-19T08:32:00.529", "component": "color_scanner", "level": "INFO", "event": "color_sensor_connected", "port": "/dev/ttyACM2"}
+{"ts": 1779172376.9635444, "ts_iso": "2026-05-19T08:32:56.963", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1779172376.9714906, "ts_iso": "2026-05-19T08:32:56.971", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1779172377.2828114, "ts_iso": "2026-05-19T08:32:57.282", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.31131744384765625, "status": "ok"}
+{"ts": 1779172377.283156, "ts_iso": "2026-05-19T08:32:57.283", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
+{"ts": 1779172462.1145947, "ts_iso": "2026-05-19T08:34:22.114", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1779172462.123819, "ts_iso": "2026-05-19T08:34:22.123", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1779172462.4369087, "ts_iso": "2026-05-19T08:34:22.436", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.31308674812316895, "status": "ok"}
+{"ts": 1779172462.4372535, "ts_iso": "2026-05-19T08:34:22.437", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
+{"ts": 1779172546.0833802, "ts_iso": "2026-05-19T08:35:46.083", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1779172546.0872905, "ts_iso": "2026-05-19T08:35:46.087", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1779172546.3973086, "ts_iso": "2026-05-19T08:35:46.397", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.3100149631500244, "status": "ok"}
+{"ts": 1779172546.397636, "ts_iso": "2026-05-19T08:35:46.397", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
+{"ts": 1779172631.54627, "ts_iso": "2026-05-19T08:37:11.546", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1779172631.5564575, "ts_iso": "2026-05-19T08:37:11.556", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1779172631.8690846, "ts_iso": "2026-05-19T08:37:11.869", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.3126225471496582, "status": "ok"}
+{"ts": 1779172631.8696284, "ts_iso": "2026-05-19T08:37:11.869", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
