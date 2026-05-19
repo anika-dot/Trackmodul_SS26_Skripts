@@ -124,3 +124,5 @@
 {"ts": 1779182301.4357953, "ts_iso": "2026-05-19T11:18:21.435", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
 {"ts": 1779182637.4036038, "ts_iso": "2026-05-19T11:23:57.403", "component": "color_scanner", "event": "logger_started"}
 {"ts": 1779182637.4504795, "ts_iso": "2026-05-19T11:23:57.450", "component": "color_scanner", "level": "INFO", "event": "color_sensor_connected", "port": "/dev/ttyACM0"}
+{"ts": 1779183477.5540154, "ts_iso": "2026-05-19T11:37:57.554", "component": "color_scanner", "event": "logger_started"}
+{"ts": 1779183477.5971372, "ts_iso": "2026-05-19T11:37:57.597", "component": "color_scanner", "level": "INFO", "event": "color_sensor_connected", "port": "/dev/ttyACM0"}

@@ -1242,3 +1242,10 @@
 {"ts": 1779182638.216787, "ts_iso": "2026-05-19T11:23:58.216", "component": "sorter", "level": "INFO", "event": "dobot_connected", "port": "/dev/ttyACM0"}
 {"ts": 1779182638.6091235, "ts_iso": "2026-05-19T11:23:58.609", "component": "pickplace", "event": "logger_started"}
 {"ts": 1779182638.6636686, "ts_iso": "2026-05-19T11:23:58.663", "component": "pickplace", "level": "INFO", "event": "dobot_connected", "port": "/dev/ttyACM2"}
+{"ts": 1779183478.3057315, "ts_iso": "2026-05-19T11:37:58.305", "component": "sorter", "event": "logger_started"}
+{"ts": 1779183478.3535168, "ts_iso": "2026-05-19T11:37:58.353", "component": "sorter", "level": "INFO", "event": "dobot_connected", "port": "/dev/ttyACM0"}
+{"ts": 1779183478.751394, "ts_iso": "2026-05-19T11:37:58.751", "component": "pickplace", "event": "logger_started"}
+{"ts": 1779183478.79517, "ts_iso": "2026-05-19T11:37:58.795", "component": "pickplace", "level": "INFO", "event": "dobot_connected", "port": "/dev/ttyACM1"}
+{"ts": 1779183478.932968, "ts_iso": "2026-05-19T11:37:58.932", "component": "controller", "event": "logger_started"}
+{"ts": 1779183479.9836538, "ts_iso": "2026-05-19T11:37:59.983", "component": "controller", "level": "INFO", "event": "run_started"}
+{"ts": 1779183479.9840102, "ts_iso": "2026-05-19T11:37:59.984", "component": "controller", "level": "INFO", "event": "action_start", "action": "pickplace_total"}
