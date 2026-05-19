@@ -107,27 +107,25 @@ jupyter notebook define_positions.ipynb
 ## 🏗️ Project Structure
 
 ```
-├── Helper functions/          # helper module
-│   └── dobot_functions.py     # Shared Dobot utility functions, import dobotmaster.lib.dobot
-│   └── mqtt_handler.py        # MQTT communication utilities
-│   └── event_logger.py        # Event logger
-│   └── dobotmaster/                 # Dobot API integration layer
-├── Instructions/               # helper module
-│   └── homing_dobot.ipynb     # Interactive homing notebook
-│   └── define_positions.ipynb # Position definition notebook
-├── Skripts/             		  # Skripts module
-│   └── controller.py            # Central workflow orchestrator, import event_logger
-│   └── dobot_sorter.py          # Sorting logic with gripper control, import dobot_functions und event_logger
-│   └── dobot_pickplace.py   	   # Pick & place operations, import dobot_functions und event_logger
-│   └── homing_dobot.py          # Robot initialization script, import dobot_functions
-│   └── create_gantt.py		#  gantt chart aus den Logs erstellen, wie gebe ich dann den Pfad zu den logs an?
-├── color_scanner/               # Color detection module
-│   └── scan_color.py			 # import dobot_functions und event_logger
-│   └── dobot_functions.py
-│   └── event_logger.py
+├── helper_functions/             # helper module
+│   └── dobot_functions.py        # shared Dobot utility functions, import dobotmaster.lib.dobot
+│   └── mqtt_handler.py           # MQTT communication utilities
+│   └── event_logger.py           # event logger
+│   └── dobotmaster/              # Dobot API integration layer
+├── instructions/                 # instructions module
+│   └── homing_dobot.ipynb        # interactive homing notebook
+│   └── define_positions.ipynb    # position definition notebook
+├── scripts/             		      # scripts module
+│   └── controller.py             # central workflow orchestrator
+│   └── dobot_sorter.py           # sorting logic with gripper control
+│   └── dobot_pickplace.py        # pick & place operations
+│   └── homing_dobot.py           # robot initialization script
+│   └── create_gantt.py	        	# create gantt chart
+├── color_scanner/                # color detection module
+│   └── scan_color.py			        # scan color
 │   └── requirements.txt
-├── logs/                        # Log files
-├── requirements.txt             # Python dependencies
+├── logs/                         # Log files
+├── requirements.txt              # Python dependencies
 └── README.md 
 ```
 

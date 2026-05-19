@@ -59,4 +59,16 @@ client.on_message = on_message
 client.connect(BROKER, 1883)
 client.subscribe("trackmodul_ah_SS26/dobot/colorsensor/command")
 
-client.loop_forever()
+def cleanup():
+    '''
+    Function to close connection manually
+    '''
+    color_sensor.close()
+    print("Dobot connection closed")
+
+# loop until user interrupts manually
+try:
+    client.loop_forever()
+except KeyboardInterrupt:
+    cleanup()
+    client.disconnect()

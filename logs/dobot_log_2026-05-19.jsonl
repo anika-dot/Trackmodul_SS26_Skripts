@@ -904,3 +904,86 @@
 {"ts": 1779180428.0129173, "ts_iso": "2026-05-19T10:47:08.012", "component": "controller", "level": "INFO", "event": "action_end", "action": "colorsensor_total", "duration_s": 0.42778444290161133}
 {"ts": 1779180428.013397, "ts_iso": "2026-05-19T10:47:08.013", "component": "controller", "level": "INFO", "event": "color_detected", "color": "blue"}
 {"ts": 1779180428.01366, "ts_iso": "2026-05-19T10:47:08.013", "component": "controller", "level": "INFO", "event": "action_start", "action": "sorter_total", "color": "blue"}
+{"ts": 1779180765.0640326, "ts_iso": "2026-05-19T10:52:45.064", "component": "pickplace", "event": "logger_started"}
+{"ts": 1779180765.1081378, "ts_iso": "2026-05-19T10:52:45.108", "component": "pickplace", "level": "INFO", "event": "dobot_connected", "port": "/dev/ttyACM2"}
+{"ts": 1779180769.3562036, "ts_iso": "2026-05-19T10:52:49.356", "component": "sorter", "event": "logger_started"}
+{"ts": 1779180769.4070904, "ts_iso": "2026-05-19T10:52:49.407", "component": "sorter", "level": "INFO", "event": "dobot_connected", "port": "/dev/ttyACM0"}
+{"ts": 1779180772.9999824, "ts_iso": "2026-05-19T10:52:52.999", "component": "controller", "event": "logger_started"}
+{"ts": 1779180774.0881526, "ts_iso": "2026-05-19T10:52:54.088", "component": "controller", "level": "INFO", "event": "run_started"}
+{"ts": 1779180774.0886493, "ts_iso": "2026-05-19T10:52:54.088", "component": "controller", "level": "INFO", "event": "action_start", "action": "pickplace_total"}
+{"ts": 1779180775.3758268, "ts_iso": "2026-05-19T10:52:55.375", "component": "pickplace", "level": "INFO", "event": "task_received", "command": "start"}
+{"ts": 1779180775.376148, "ts_iso": "2026-05-19T10:52:55.376", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "move_to_home_initial"}
+{"ts": 1779180781.8982272, "ts_iso": "2026-05-19T10:53:01.898", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "move_to_home_initial", "duration_s": 6.52206826210022, "status": "ok"}
+{"ts": 1779180781.9022882, "ts_iso": "2026-05-19T10:53:01.902", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "conveyor_belt_running_until_object_detected"}
+{"ts": 1779180784.0177464, "ts_iso": "2026-05-19T10:53:04.017", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "conveyor_belt_running_until_object_detected", "duration_s": 2.115455389022827, "status": "ok"}
+{"ts": 1779180784.0183, "ts_iso": "2026-05-19T10:53:04.018", "component": "pickplace", "level": "INFO", "event": "object_detected_by_ir_sensor"}
+{"ts": 1779180784.0186214, "ts_iso": "2026-05-19T10:53:04.018", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "gripper_open"}
+{"ts": 1779180787.02288, "ts_iso": "2026-05-19T10:53:07.022", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "gripper_open", "duration_s": 3.004253387451172, "status": "ok"}
+{"ts": 1779180787.023448, "ts_iso": "2026-05-19T10:53:07.023", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "move_to_pick"}
+{"ts": 1779180793.5496721, "ts_iso": "2026-05-19T10:53:13.549", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "move_to_pick", "duration_s": 6.526218414306641, "status": "ok"}
+{"ts": 1779180793.5969858, "ts_iso": "2026-05-19T10:53:13.596", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "gripper_close"}
+{"ts": 1779180796.601498, "ts_iso": "2026-05-19T10:53:16.601", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "gripper_close", "duration_s": 3.004509687423706, "status": "ok"}
+{"ts": 1779180796.602091, "ts_iso": "2026-05-19T10:53:16.602", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "move_to_color_sensor"}
+{"ts": 1779180805.6393964, "ts_iso": "2026-05-19T10:53:25.639", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "move_to_color_sensor", "duration_s": 9.037301063537598, "status": "ok"}
+{"ts": 1779180805.6399927, "ts_iso": "2026-05-19T10:53:25.639", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "gripper_open"}
+{"ts": 1779180808.6498158, "ts_iso": "2026-05-19T10:53:28.649", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "gripper_open", "duration_s": 3.0098180770874023, "status": "ok"}
+{"ts": 1779180808.650392, "ts_iso": "2026-05-19T10:53:28.650", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "move_to_home_final"}
+{"ts": 1779180817.6902068, "ts_iso": "2026-05-19T10:53:37.690", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "move_to_home_final", "duration_s": 9.039810180664062, "status": "ok"}
+{"ts": 1779180817.6907787, "ts_iso": "2026-05-19T10:53:37.690", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "gripper_close"}
+{"ts": 1779180820.6990333, "ts_iso": "2026-05-19T10:53:40.699", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "gripper_close", "duration_s": 3.0082497596740723, "status": "ok"}
+{"ts": 1779180820.6996279, "ts_iso": "2026-05-19T10:53:40.699", "component": "pickplace", "level": "INFO", "event": "task_finished"}
+{"ts": 1779180820.7607641, "ts_iso": "2026-05-19T10:53:40.760", "component": "controller", "level": "INFO", "event": "mqtt_received", "topic": "trackmodul_ah_SS26/dobot/pickplace/status", "payload": {"status": "done"}}
+{"ts": 1779180820.7613943, "ts_iso": "2026-05-19T10:53:40.761", "component": "controller", "level": "INFO", "event": "action_end", "action": "pickplace_total", "duration_s": 46.67273998260498}
+{"ts": 1779180820.7617638, "ts_iso": "2026-05-19T10:53:40.761", "component": "controller", "level": "INFO", "event": "action_start", "action": "colorsensor_total"}
+{"ts": 1779180821.2199612, "ts_iso": "2026-05-19T10:53:41.219", "component": "controller", "level": "INFO", "event": "mqtt_received", "topic": "trackmodul_ah_SS26/dobot/colorsensor/status", "payload": {"status": "done", "color": "blue"}}
+{"ts": 1779180821.2205245, "ts_iso": "2026-05-19T10:53:41.220", "component": "controller", "level": "INFO", "event": "action_end", "action": "colorsensor_total", "duration_s": 0.45876145362854004}
+{"ts": 1779180821.2209587, "ts_iso": "2026-05-19T10:53:41.220", "component": "controller", "level": "INFO", "event": "color_detected", "color": "blue"}
+{"ts": 1779180821.221276, "ts_iso": "2026-05-19T10:53:41.221", "component": "controller", "level": "INFO", "event": "action_start", "action": "sorter_total", "color": "blue"}
+{"ts": 1779180821.2634223, "ts_iso": "2026-05-19T10:53:41.263", "component": "sorter", "level": "INFO", "event": "sorter_start", "command": "blue"}
+{"ts": 1779180821.2639759, "ts_iso": "2026-05-19T10:53:41.263", "component": "sorter", "level": "INFO", "event": "action_start", "action": "move_to_home_initial"}
+{"ts": 1779180827.784899, "ts_iso": "2026-05-19T10:53:47.784", "component": "sorter", "level": "INFO", "event": "action_end", "action": "move_to_home_initial", "duration_s": 6.520921945571899, "status": "ok"}
+{"ts": 1779180827.7852652, "ts_iso": "2026-05-19T10:53:47.785", "component": "sorter", "level": "INFO", "event": "action_start", "action": "gripper_open"}
+{"ts": 1779180830.7945092, "ts_iso": "2026-05-19T10:53:50.794", "component": "sorter", "level": "INFO", "event": "action_end", "action": "gripper_open", "duration_s": 3.0092391967773438, "status": "ok"}
+{"ts": 1779180830.7948303, "ts_iso": "2026-05-19T10:53:50.794", "component": "sorter", "level": "INFO", "event": "action_start", "action": "move_to_color_sensor"}
+{"ts": 1779180837.3145914, "ts_iso": "2026-05-19T10:53:57.314", "component": "sorter", "level": "INFO", "event": "action_end", "action": "move_to_color_sensor", "duration_s": 6.519753932952881, "status": "ok"}
+{"ts": 1779180837.31517, "ts_iso": "2026-05-19T10:53:57.315", "component": "sorter", "level": "INFO", "event": "action_start", "action": "gripper_close"}
+{"ts": 1779180840.3232253, "ts_iso": "2026-05-19T10:54:00.323", "component": "sorter", "level": "INFO", "event": "action_end", "action": "gripper_close", "duration_s": 3.0080511569976807, "status": "ok"}
+{"ts": 1779180840.3238614, "ts_iso": "2026-05-19T10:54:00.323", "component": "sorter", "level": "INFO", "event": "action_start", "action": "move_to_conveyor"}
+{"ts": 1779180850.8652902, "ts_iso": "2026-05-19T10:54:10.865", "component": "sorter", "level": "INFO", "event": "action_end", "action": "move_to_conveyor", "duration_s": 10.541424989700317, "status": "ok"}
+{"ts": 1779180850.8658705, "ts_iso": "2026-05-19T10:54:10.865", "component": "sorter", "level": "INFO", "event": "action_start", "action": "gripper_close"}
+{"ts": 1779180853.872202, "ts_iso": "2026-05-19T10:54:13.872", "component": "sorter", "level": "INFO", "event": "action_end", "action": "gripper_close", "duration_s": 3.0063271522521973, "status": "ok"}
+{"ts": 1779180853.8727734, "ts_iso": "2026-05-19T10:54:13.872", "component": "sorter", "level": "INFO", "event": "action_start", "action": "move_to_home_final"}
+{"ts": 1779180862.9111447, "ts_iso": "2026-05-19T10:54:22.911", "component": "sorter", "level": "INFO", "event": "action_end", "action": "move_to_home_final", "duration_s": 9.038365602493286, "status": "ok"}
+{"ts": 1779180862.911776, "ts_iso": "2026-05-19T10:54:22.911", "component": "sorter", "level": "INFO", "event": "sorter_finished", "command": "blue"}
+{"ts": 1779180864.3050282, "ts_iso": "2026-05-19T10:54:24.305", "component": "controller", "level": "INFO", "event": "mqtt_received", "topic": "trackmodul_ah_SS26/dobot/sorter/status", "payload": {"status": "done"}}
+{"ts": 1779180864.3055575, "ts_iso": "2026-05-19T10:54:24.305", "component": "controller", "level": "INFO", "event": "action_end", "action": "sorter_total", "duration_s": 43.0842809677124}
+{"ts": 1779180864.3059258, "ts_iso": "2026-05-19T10:54:24.305", "component": "controller", "level": "INFO", "event": "run_finished"}
+{"ts": 1779180864.3063362, "ts_iso": "2026-05-19T10:54:24.306", "component": "controller", "level": "INFO", "event": "action_start", "action": "pickplace_total"}
+{"ts": 1779180864.3856754, "ts_iso": "2026-05-19T10:54:24.385", "component": "pickplace", "level": "INFO", "event": "task_received", "command": "start"}
+{"ts": 1779180864.386274, "ts_iso": "2026-05-19T10:54:24.386", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "move_to_home_initial"}
+{"ts": 1779180870.91312, "ts_iso": "2026-05-19T10:54:30.913", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "move_to_home_initial", "duration_s": 6.5268402099609375, "status": "ok"}
+{"ts": 1779180870.9221632, "ts_iso": "2026-05-19T10:54:30.922", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "conveyor_belt_running_until_object_detected"}
+{"ts": 1779180871.6717367, "ts_iso": "2026-05-19T10:54:31.671", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "conveyor_belt_running_until_object_detected", "duration_s": 0.7495739459991455, "status": "ok"}
+{"ts": 1779180871.6722808, "ts_iso": "2026-05-19T10:54:31.672", "component": "pickplace", "level": "INFO", "event": "object_detected_by_ir_sensor"}
+{"ts": 1779180871.6726034, "ts_iso": "2026-05-19T10:54:31.672", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "gripper_open"}
+{"ts": 1779180874.6768584, "ts_iso": "2026-05-19T10:54:34.676", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "gripper_open", "duration_s": 3.004249095916748, "status": "ok"}
+{"ts": 1779180874.6774473, "ts_iso": "2026-05-19T10:54:34.677", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "move_to_pick"}
+{"ts": 1779180881.202246, "ts_iso": "2026-05-19T10:54:41.202", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "move_to_pick", "duration_s": 6.524791955947876, "status": "ok"}
+{"ts": 1779180881.2028406, "ts_iso": "2026-05-19T10:54:41.202", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "gripper_close"}
+{"ts": 1779180884.211642, "ts_iso": "2026-05-19T10:54:44.211", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "gripper_close", "duration_s": 3.0087947845458984, "status": "ok"}
+{"ts": 1779180884.2122247, "ts_iso": "2026-05-19T10:54:44.212", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "move_to_color_sensor"}
+{"ts": 1779180893.2510562, "ts_iso": "2026-05-19T10:54:53.251", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "move_to_color_sensor", "duration_s": 9.038825750350952, "status": "ok"}
+{"ts": 1779180893.2517047, "ts_iso": "2026-05-19T10:54:53.251", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "gripper_open"}
+{"ts": 1779180896.2603614, "ts_iso": "2026-05-19T10:54:56.260", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "gripper_open", "duration_s": 3.008652925491333, "status": "ok"}
+{"ts": 1779180896.2609763, "ts_iso": "2026-05-19T10:54:56.260", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "move_to_home_final"}
+{"ts": 1779180905.2994027, "ts_iso": "2026-05-19T10:55:05.299", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "move_to_home_final", "duration_s": 9.038420915603638, "status": "ok"}
+{"ts": 1779180905.2999897, "ts_iso": "2026-05-19T10:55:05.299", "component": "pickplace", "level": "INFO", "event": "action_start", "action": "gripper_close"}
+{"ts": 1779180908.309303, "ts_iso": "2026-05-19T10:55:08.309", "component": "pickplace", "level": "INFO", "event": "action_end", "action": "gripper_close", "duration_s": 3.009308099746704, "status": "ok"}
+{"ts": 1779180908.3098755, "ts_iso": "2026-05-19T10:55:08.309", "component": "pickplace", "level": "INFO", "event": "task_finished"}
+{"ts": 1779180908.3937397, "ts_iso": "2026-05-19T10:55:08.393", "component": "controller", "level": "INFO", "event": "mqtt_received", "topic": "trackmodul_ah_SS26/dobot/pickplace/status", "payload": {"status": "done"}}
+{"ts": 1779180908.3942757, "ts_iso": "2026-05-19T10:55:08.394", "component": "controller", "level": "INFO", "event": "action_end", "action": "pickplace_total", "duration_s": 44.08793926239014}
+{"ts": 1779180908.3946853, "ts_iso": "2026-05-19T10:55:08.394", "component": "controller", "level": "INFO", "event": "action_start", "action": "colorsensor_total"}
+{"ts": 1779180908.846573, "ts_iso": "2026-05-19T10:55:08.846", "component": "controller", "level": "INFO", "event": "mqtt_received", "topic": "trackmodul_ah_SS26/dobot/colorsensor/status", "payload": {"status": "done", "color": "other"}}
+{"ts": 1779180908.8471546, "ts_iso": "2026-05-19T10:55:08.847", "component": "controller", "level": "INFO", "event": "action_end", "action": "colorsensor_total", "duration_s": 0.4524688720703125}
+{"ts": 1779180908.8476946, "ts_iso": "2026-05-19T10:55:08.847", "component": "controller", "level": "INFO", "event": "color_detected", "color": "other"}
+{"ts": 1779180908.848044, "ts_iso": "2026-05-19T10:55:08.848", "component": "controller", "level": "INFO", "event": "action_start", "action": "sorter_total", "color": "other"}

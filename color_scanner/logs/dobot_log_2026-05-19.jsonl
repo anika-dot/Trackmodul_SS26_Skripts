@@ -90,3 +90,13 @@
 {"ts": 1779180427.643764, "ts_iso": "2026-05-19T10:47:07.643", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
 {"ts": 1779180427.9525478, "ts_iso": "2026-05-19T10:47:07.952", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.3087787628173828, "status": "ok"}
 {"ts": 1779180427.9529986, "ts_iso": "2026-05-19T10:47:07.953", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
+{"ts": 1779180759.924173, "ts_iso": "2026-05-19T10:52:39.924", "component": "color_scanner", "event": "logger_started"}
+{"ts": 1779180759.9879758, "ts_iso": "2026-05-19T10:52:39.987", "component": "color_scanner", "level": "INFO", "event": "color_sensor_connected", "port": "/dev/ttyACM0"}
+{"ts": 1779180820.837339, "ts_iso": "2026-05-19T10:53:40.837", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1779180820.845172, "ts_iso": "2026-05-19T10:53:40.845", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1779180821.155422, "ts_iso": "2026-05-19T10:53:41.155", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.3102438449859619, "status": "ok"}
+{"ts": 1779180821.1559505, "ts_iso": "2026-05-19T10:53:41.155", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
+{"ts": 1779180908.4411144, "ts_iso": "2026-05-19T10:55:08.441", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1779180908.4462402, "ts_iso": "2026-05-19T10:55:08.446", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1779180908.7578847, "ts_iso": "2026-05-19T10:55:08.757", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.31163787841796875, "status": "ok"}
+{"ts": 1779180908.758722, "ts_iso": "2026-05-19T10:55:08.758", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "other"}
