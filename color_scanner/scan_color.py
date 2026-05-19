@@ -9,8 +9,8 @@ from xml.etree.ElementTree import VERSION
 from xmlrpc import client
 import paho.mqtt.client as mqtt
 from pydobotplus import Dobot
-from dobot_functions import find_dobot_ports
-from event_logger import EventLogger
+from helper_functions.dobot_functions import find_dobot_ports
+from helper_functions.event_logger import EventLogger
 
 BROKER = "broker.hivemq.com"
 log = EventLogger("color_scanner")

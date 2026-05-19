@@ -1,7 +1,7 @@
 from serial.tools import list_ports
 from serial import Serial, SerialException
 from time import sleep
-from dobotmaster.lib.dobot import Dobot
+from helper_functions.dobotmaster.lib.dobot import Dobot
 
 SAFE_Z = 100  # save height for moving in XY plane without hitting anything
 

@@ -7,7 +7,7 @@ the actions for them are handled in separate scripts.
 import time
 import json
 import paho.mqtt.client as mqtt
-from event_logger import EventLogger
+from helper_functions.event_logger import EventLogger
 
 BROKER = "broker.hivemq.com"
 state = "INIT"

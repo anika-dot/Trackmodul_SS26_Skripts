@@ -13,6 +13,10 @@ import argparse
 from collections import defaultdict
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent  # scripts/ → project_root/
+LOG_DIR = ROOT_DIR / "logs"
 
 
 def load_events(path):
@@ -107,7 +111,7 @@ def plot_gantt(intervals, output=None):
     )
 
     plt.tight_layout()
-
+    print(output)
     if output:
         plt.savefig(output, dpi=150)
         print(f"Gantt-Chart gespeichert: {output}")
@@ -138,6 +142,7 @@ def main():
     parser.add_argument("logfile", help="Pfad zur .jsonl Logdatei")
     parser.add_argument("--output", "-o", help="Bildpfad (z.B. gantt.png). Ohne diesen Parameter wird nur angezeigt.")
     args = parser.parse_args()
+    print(parser)
 
     events = load_events(args.logfile)
     intervals = build_intervals(events)

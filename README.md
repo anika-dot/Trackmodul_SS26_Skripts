@@ -107,20 +107,28 @@ jupyter notebook define_positions.ipynb
 ## 🏗️ Project Structure
 
 ```
-├── controller.py                # Central workflow orchestrator
-├── dobot_sorter.py              # Sorting logic with gripper control
-├── dobot_pickplace.py           # Pick & place operations
-├── dobot_functions.py           # Shared Dobot utility functions
-├── mqtt_handler.py              # MQTT communication utilities
-├── homing_dobot.py              # Robot initialization script
-├── homing_dobot.ipynb           # Interactive homing notebook
-├── define_positions.ipynb       # Position definition tool
+├── Helper functions/          # helper module
+│   └── dobot_functions.py     # Shared Dobot utility functions, import dobotmaster.lib.dobot
+│   └── mqtt_handler.py        # MQTT communication utilities
+│   └── event_logger.py        # Event logger
+│   └── dobotmaster/                 # Dobot API integration layer
+├── Instructions/               # helper module
+│   └── homing_dobot.ipynb     # Interactive homing notebook
+│   └── define_positions.ipynb # Position definition notebook
+├── Skripts/             		  # Skripts module
+│   └── controller.py            # Central workflow orchestrator, import event_logger
+│   └── dobot_sorter.py          # Sorting logic with gripper control, import dobot_functions und event_logger
+│   └── dobot_pickplace.py   	   # Pick & place operations, import dobot_functions und event_logger
+│   └── homing_dobot.py          # Robot initialization script, import dobot_functions
+│   └── create_gantt.py		#  gantt chart aus den Logs erstellen, wie gebe ich dann den Pfad zu den logs an?
 ├── color_scanner/               # Color detection module
+│   └── scan_color.py			 # import dobot_functions und event_logger
+│   └── dobot_functions.py
+│   └── event_logger.py
 │   └── requirements.txt
 ├── logs/                        # Log files
-├── dobotmaster/                 # Dobot API integration layer
 ├── requirements.txt             # Python dependencies
-└── README.md
+└── README.md 
 ```
 
 ## 🔄 Workflow

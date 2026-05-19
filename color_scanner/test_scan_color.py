@@ -3,7 +3,7 @@ import time
 from turtle import color
 from xml.etree.ElementTree import VERSION
 from xmlrpc import client
-from dobot_functions import find_dobot_ports
+from helper_functions.dobot_functions import find_dobot_ports
 from pydobotplus import Dobot
 
 

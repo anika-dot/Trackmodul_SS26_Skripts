@@ -7,8 +7,8 @@ import time
 from turtle import color
 import paho.mqtt.client as mqtt
 from dobotapi import Dobot
-from dobot_functions import find_dobot_ports, safe_move
-from event_logger import EventLogger
+from helper_functions.dobot_functions import find_dobot_ports, safe_move
+from helper_functions.event_logger import EventLogger
 
 BROKER = "broker.hivemq.com"
 log = EventLogger("sorter")
