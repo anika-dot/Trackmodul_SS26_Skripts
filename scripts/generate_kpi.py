@@ -49,9 +49,9 @@ def extract_cycles(events):
         action = ev.get("action", "")
 
         if (event_type == "action_start"and component == "controller" and action == "pickplace_total"):
-
-            if current_cycle: cycles.append(current_cycle)
-
+            if current_cycle: 
+                cycles.append(current_cycle)
+                
             current_cycle = {
                 "start_ts": ev["ts"],
                 "pickplace_duration": None,
