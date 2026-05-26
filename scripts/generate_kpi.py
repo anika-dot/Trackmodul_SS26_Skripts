@@ -15,6 +15,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
+COMPONENT_COLORS = {
+    "controller": "#1abb58",
+    "pickplace": "#1a80bb",
+    "sorter": "#b8b8b8",
+}
+
+
 def load_events(path):
     '''
     Loads events from a JSONL file, skipping invalid lines.
@@ -388,6 +395,56 @@ def plot_action_boxplot(kpis, outdir):
     print(f"   → {path}")
 
 
+def plot_gantt(kpis, outdir):
+    '''
+    Gantt chart of all action intervals.
+    '''
+    intervals = kpis["intervals"]
+    if not intervals:
+        return
+
+    t0 = min(iv["start"] for iv in intervals)
+    components = sorted({iv["component"] for iv in intervals})
+    y_pos = {c: i for i, c in enumerate(components)}
+    fig, ax = plt.subplots(figsize=(14, 1.2 + len(components)))
+
+    for iv in intervals:
+        duration = iv["duration"]
+        ax.barh(
+            y=y_pos[iv["component"]],
+            width=max(duration, 0.05),
+            left=iv["start"] - t0,
+            height=0.6,
+            color=COMPONENT_COLORS.get(iv["component"], "gray"),
+            edgecolor="black",
+            linewidth=0.5,
+        )
+        ax.text(
+            iv["start"] - t0 + duration / 2,
+            y_pos[iv["component"]],
+            f"{iv['action']}",
+            ha="center",
+            va="center",
+            fontsize=7,
+            color="white",
+            clip_on=True,
+        )
+    ax.set(
+        yticks=list(y_pos.values()),
+        yticklabels=list(y_pos.keys()),
+        xlabel="Time since start [s]",
+        title="Gantt Chart",
+    )
+    ax.invert_yaxis()
+    ax.grid(axis="x", linestyle="--", alpha=0.3)
+    plt.tight_layout()
+    path = outdir / "gantt_chart.png"
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+    print(f"   → {path}")
+
+
 def export_csv(kpis, outdir):
     '''
     Export cycles and intervals as CSV files for further analysis.
@@ -435,6 +492,7 @@ def main():
     plot_phase_breakdown(kpis, outdir)
     plot_color_distribution(kpis, outdir)
     plot_action_boxplot(kpis, outdir)
+    plot_gantt(kpis, outdir)
 
     export_csv(kpis, outdir)
 
