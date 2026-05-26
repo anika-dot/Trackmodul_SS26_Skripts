@@ -14,3 +14,11 @@ Thumbs.db
 
 # Env files
 .env
+
+# report files
+scripts/report
+
+# log files
+logs/
+scripts/logs/
+color_scanner/logs/
