@@ -20,7 +20,7 @@ dobot1.connect()
 log.info("dobot_connected", port=ports[0])
 
 HOME_POSITION = (209.6999969482422, 0.0, 100.0, 0.0)
-PICK_POSITION = (230, 85, 30, 55) 
+PICK_POSITION = (230, 83, 30, 55) 
 SENSOR_POSITION = (150, 255, 50, 45)
 
 SLEEP_TIME = 1.5

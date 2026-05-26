@@ -31,6 +31,8 @@ def on_message(client, userdata, msg):
     Function to define the process for the dobot sorter. 
     2 options, depending on the feedback of the color sensor (blue or other color)
     '''
+    print(f"[SORTER] Nachricht empfangen: {msg.payload.decode()}")  # To Do: Delete print statement
+
     data = json.loads(msg.payload.decode())
 
     if data.get("command") == "sorting other":
