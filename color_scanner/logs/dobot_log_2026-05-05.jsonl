@@ -1,0 +1,14 @@
+{"ts": 1777975956.0556679, "ts_iso": "2026-05-05T12:12:36.055", "component": "color_scanner", "event": "logger_started"}
+{"ts": 1777975956.1102133, "ts_iso": "2026-05-05T12:12:36.110", "component": "color_scanner", "level": "INFO", "event": "color_sensor_connected", "port": "/dev/ttyACM0"}
+{"ts": 1777976009.4026096, "ts_iso": "2026-05-05T12:13:29.402", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1777976009.408928, "ts_iso": "2026-05-05T12:13:29.408", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1777976009.7178156, "ts_iso": "2026-05-05T12:13:29.717", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.3088836669921875, "status": "ok"}
+{"ts": 1777976009.718153, "ts_iso": "2026-05-05T12:13:29.718", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "other"}
+{"ts": 1777976142.6286948, "ts_iso": "2026-05-05T12:15:42.628", "component": "color_scanner", "event": "logger_started"}
+{"ts": 1777976142.6830912, "ts_iso": "2026-05-05T12:15:42.683", "component": "color_scanner", "level": "INFO", "event": "color_sensor_connected", "port": "/dev/ttyACM1"}
+{"ts": 1777976181.8241327, "ts_iso": "2026-05-05T12:16:21.824", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1777976181.8319962, "ts_iso": "2026-05-05T12:16:21.832", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1777976182.142118, "ts_iso": "2026-05-05T12:16:22.142", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.3101167678833008, "status": "ok"}
+{"ts": 1777976182.1426234, "ts_iso": "2026-05-05T12:16:22.142", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "other"}
+{"ts": 1777976261.404328, "ts_iso": "2026-05-05T12:17:41.404", "component": "color_scanner", "event": "logger_started"}
+{"ts": 1777976261.462344, "ts_iso": "2026-05-05T12:17:41.462", "component": "color_scanner", "level": "INFO", "event": "color_sensor_connected", "port": "/dev/ttyACM0"}

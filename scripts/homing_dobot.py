@@ -1,5 +1,5 @@
 
-from dobot_functions import find_dobot_ports, init_and_home_dobot, safe_move
+from helper_functions.dobot_functions import find_dobot_ports, init_and_home_dobot, safe_move
 import time
 
 ports = find_dobot_ports()

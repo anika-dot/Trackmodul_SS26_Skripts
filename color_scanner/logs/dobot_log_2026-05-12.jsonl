@@ -1,0 +1,12 @@
+{"ts": 1778580765.382186, "ts_iso": "2026-05-12T12:12:45.382", "component": "color_scanner", "event": "logger_started"}
+{"ts": 1778580765.4401202, "ts_iso": "2026-05-12T12:12:45.440", "component": "color_scanner", "level": "INFO", "event": "color_sensor_connected", "port": "/dev/ttyACM1"}
+{"ts": 1778580847.1283953, "ts_iso": "2026-05-12T12:14:07.128", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1778580847.1368246, "ts_iso": "2026-05-12T12:14:07.136", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1778580847.4462621, "ts_iso": "2026-05-12T12:14:07.446", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.3094336986541748, "status": "ok"}
+{"ts": 1778580847.4466, "ts_iso": "2026-05-12T12:14:07.446", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
+{"ts": 1778580938.07321, "ts_iso": "2026-05-12T12:15:38.073", "component": "color_scanner", "event": "logger_started"}
+{"ts": 1778580938.1248965, "ts_iso": "2026-05-12T12:15:38.124", "component": "color_scanner", "level": "INFO", "event": "color_sensor_connected", "port": "/dev/ttyACM1"}
+{"ts": 1778581014.033181, "ts_iso": "2026-05-12T12:16:54.033", "component": "color_scanner", "level": "INFO", "event": "color_sensor_start_scanning"}
+{"ts": 1778581014.0435045, "ts_iso": "2026-05-12T12:16:54.043", "component": "color_scanner", "level": "INFO", "event": "action_start", "action": "color_scanning"}
+{"ts": 1778581014.3559768, "ts_iso": "2026-05-12T12:16:54.355", "component": "color_scanner", "level": "INFO", "event": "action_end", "action": "color_scanning", "duration_s": 0.3124680519104004, "status": "ok"}
+{"ts": 1778581014.3565524, "ts_iso": "2026-05-12T12:16:54.356", "component": "color_scanner", "level": "INFO", "event": "color_scanning_finished", "color": "blue"}
