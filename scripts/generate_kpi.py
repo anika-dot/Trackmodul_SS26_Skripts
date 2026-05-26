@@ -1,27 +1,23 @@
-"""
-generate kpi report and visualizations from the dobot log file
+'''
+Generate kpi report and visualizations from the dobot log file.
 
 Usage:
     python generate_kpi.py logs/dobot_log.jsonl
     python generate_kpi.py logs/dobot_log.jsonl
-"""
+'''
 
 import json
 import argparse
 from pathlib import Path
 from collections import defaultdict
 from statistics import mean, stdev
-
 import pandas as pd
 import matplotlib.pyplot as plt
-
-ROOT_DIR = Path(__file__).resolve().parent.parent
-LOG_DIR = ROOT_DIR / "logs"
 
 
 def load_events(path):
     '''
-    Load events from a JSONL file, skipping invalid lines.
+    Loads events from a JSONL file, skipping invalid lines.
     '''
     events = []
     with open(path, "r", encoding="utf-8") as f:
@@ -32,227 +28,342 @@ def load_events(path):
             try:
                 events.append(json.loads(line))
             except json.JSONDecodeError:
-                print("Ungültige JSON-Zeile übersprungen")
+                continue
     return events
 
 
-def split_runs(events):
+def extract_cycles(events):
     '''
-    Split the events into runs based on "run_started" and "run_finished" events.
+    Extracts cycles from events by matching start and end conditions.
+    
+    New cycle starts at: action_start + action == pickplace_total
+    Cycle ends at: run_finished
     '''
-    runs = []
-    current = []
+
+    cycles = []
+    current_cycle = None
 
     for ev in events:
-        if ev.get("event") == "run_started":
-            current = [ev]
-        elif current:
-            current.append(ev)
-            if ev.get("event") == "run_finished":
-                runs.append(current)
-                current = []
-    return runs
+        event_type = ev.get("event")
+        component = ev.get("component", "")
+        action = ev.get("action", "")
+
+        if (event_type == "action_start"and component == "controller" and action == "pickplace_total"):
+
+            if current_cycle: cycles.append(current_cycle)
+
+            current_cycle = {
+                "start_ts": ev["ts"],
+                "pickplace_duration": None,
+                "colorsensor_duration": None,
+                "sorter_duration": None,
+                "color": None,
+                "status": "ok",
+            }
+
+        if not current_cycle:
+            continue
+
+        if (event_type == "action_end" and component == "controller"):
+            if action == "pickplace_total":
+                current_cycle["pickplace_duration"] = ev.get("duration_s")
+            elif action == "colorsensor_total":
+                current_cycle["colorsensor_duration"] = ev.get("duration_s")
+            elif action == "sorter_total":
+                current_cycle["sorter_duration"] = ev.get("duration_s")
+
+            # error in any phase marks the whole cycle as error
+            if ev.get("status") == "error":
+                current_cycle["status"] = "error"
+
+        # color detected event
+        elif event_type == "color_detected":
+            detected_color = ev.get("color")
+
+            if detected_color:
+                detected_color = detected_color.lower().strip()
+
+            current_cycle["color"] = detected_color
+
+        # cycle end
+        elif event_type == "run_finished":
+            current_cycle["end_ts"] = ev["ts"]
+            current_cycle["total_duration"] = (ev["ts"] - current_cycle["start_ts"])
+
+            cycles.append(current_cycle)
+            current_cycle = None
+
+    return cycles
 
 
-def build_intervals(events):
+def extract_action_intervals(events):
     '''
-    Generate intervals for each action by matching start and end events.
+    Extract all action intervals by matching action_start and action_end events.
     '''
     open_actions = {}
     intervals = []
 
     for ev in events:
         if ev.get("event") == "action_start":
-            key = (
-                ev["component"],
-                ev["action"]
-            )
+            key = (ev.get("component"), ev.get("action"))
             open_actions[key] = ev
 
         elif ev.get("event") == "action_end":
-            key = (
-                ev["component"],
-                ev["action"]
-            )
-
+            key = (ev.get("component"), ev.get("action"))
             start_ev = open_actions.pop(key, None)
-            if start_ev is None:
-                continue
-
-            intervals.append({
-                "component": ev["component"],
-                "action": ev["action"],
-                "start": start_ev["ts"],
-                "end": ev["ts"],
-                "duration": ev.get(
-                    "duration_s",
-                    ev["ts"] - start_ev["ts"]
-                ),
-                "status": ev.get("status", "unknown"),
-            })
+            if start_ev:
+                intervals.append({
+                    "component": ev.get("component"),
+                    "action": ev.get("action"),
+                    "start": start_ev["ts"],
+                    "end": ev["ts"],
+                    "duration": ev.get("duration_s", ev["ts"] - start_ev["ts"]),
+                    "status": ev.get("status", "ok"),
+                })
 
     return intervals
 
 
-def compute_kpis(runs):
+def compute_kpis(cycles, intervals):
+    ''''
+    Compute KPI from the extracted cycles and intervals.
     '''
-    Compute KPIs from the runs:
-    - Average duration of each action
-    - Success rate of actions
-    - Distribution of detected colors
-    - MQTT latency for pickplace actions
-    '''
-    all_intervals = []
-    run_durations = []
+
+    # phase duration
+    phase_durations = {
+        "pickplace": [],
+        "colorsensor": [],
+        "sorter": [],
+    }
+
+    cycle_totals = []
     colors = defaultdict(int)
-    mqtt_latencies = []
+    errors = 0
 
-    for run_idx, run in enumerate(runs):
-        intervals = build_intervals(run)
-        for iv in intervals:
-            iv["run"] = run_idx + 1
-        all_intervals.extend(intervals)
+    for cycle in cycles:
+        if cycle["pickplace_duration"]:
+            phase_durations["pickplace"].append(cycle["pickplace_duration"])
+        if cycle["colorsensor_duration"]:
+            phase_durations["colorsensor"].append(cycle["colorsensor_duration"])
+        if cycle["sorter_duration"]:
+            phase_durations["sorter"].append(cycle["sorter_duration"])
+        if cycle.get("total_duration"):
+            cycle_totals.append(cycle["total_duration"])
+        if cycle.get("color"):
+            colors[cycle["color"]] += 1
+        if cycle.get("status") == "error":
+            errors += 1
 
-        # Run-duration
-        start = run[0]["ts"]
-        end = run[-1]["ts"]
-        run_durations.append(end - start)
-
-        # color distribution
-        for ev in run:
-            if ev.get("event") == "color_detected":
-                colors[ev.get("color", "unknown")] += 1
-
-        # MQTT-Latency
-        action_end_ts = None
-
-        for ev in run:
-            if (
-                ev.get("event") == "task_finished"
-                and ev.get("component") == "pickplace"
-            ):
-                action_end_ts = ev["ts"]
-            if (
-                action_end_ts
-                and ev.get("event") == "mqtt_received"
-                and "pickplace/status" in ev.get("topic", "")
-            ):
-                mqtt_latencies.append(ev["ts"] - action_end_ts)
-                action_end_ts = None
-
-    # Action-Stats
-    by_action = defaultdict(list)
-
-    for iv in all_intervals:
-        by_action[iv["action"]].append(iv["duration"])
-
-    action_stats = {}
-
-    for action, durations in by_action.items():
-        action_stats[action] = {
-            "count": len(durations),
-            "avg": mean(durations),
-            "min": min(durations),
-            "max": max(durations),
-            "std": stdev(durations) if len(durations) > 1 else 0.0,
+    # compute basic statistics
+    def calc_stats(values):
+        if not values:
+            return {"count": 0, "avg": 0, "min": 0, "max": 0, "std": 0, "total": 0}
+        return {
+            "count": len(values),
+            "avg": mean(values),
+            "min": min(values),
+            "max": max(values),
+            "std": stdev(values) if len(values) > 1 else 0,
+            "total": sum(values),
         }
 
-    # Error-rate
-    total_actions = len(all_intervals)
+    # action statistics (for detailed analysis)
+    action_durations = defaultdict(list)
+    for iv in intervals:
+        action_durations[iv["action"]].append(iv["duration"])
 
-    failed_actions = sum(
-        1 for iv in all_intervals
-        if iv["status"] == "error"
-)
+    action_stats = {
+        action: calc_stats(durations)
+        for action, durations in action_durations.items()
+    }
 
-    success_rate = (
-        (total_actions - failed_actions)
-        / total_actions * 100
-    ) if total_actions else 0
+    success_rate = ((len(cycles) - errors) / len(cycles) * 100) if cycles else 0
 
     return {
-        "runs": len(runs),
-        "run_durations": run_durations,
-        "mqtt_latencies": mqtt_latencies,
+        "total_cycles": len(cycles),
+        "total_runtime": sum(cycle_totals),
+        "cycle_stats": calc_stats(cycle_totals),
+        "phase_stats": {
+            phase: calc_stats(durations)
+            for phase, durations in phase_durations.items()
+        },
+        "action_stats": action_stats,
         "color_distribution": dict(colors),
         "success_rate": success_rate,
-        "intervals": all_intervals,
-        "action_stats": action_stats,
+        "errors": errors,
+        "cycles": cycles,
+        "intervals": intervals,
     }
 
 
 def print_report(kpis):
     '''
-    Print a concise KPI report to the console.
+    Print a formatted KPI report to the console.
     '''
-    print("\n================ KPI REPORT ================\n")
-    print(f"Runs:                    {kpis['runs']}")
-    print(f"Ø Run Duration:             "
-        f"{mean(kpis['run_durations']):.2f}s")
+    print("\n" + "=" * 60)
+    print("                    KPI REPORT")
+    print("=" * 60)
 
-    print(f"Success Rate:             "
-        f"{kpis['success_rate']:.2f}%")
+    print(f"\n Overview")
+    print(f"   Number of cycles:         {kpis['total_cycles']}")
+    print(f"   Total runtime:            {kpis['total_runtime']:.2f} s "
+          f"({kpis['total_runtime']/60:.2f} min)")
+    print(f"   Success rate:             {kpis['success_rate']:.1f}%")
+    print(f"   Errors:                   {kpis['errors']}")
 
-    if kpis["mqtt_latencies"]:
-        print(f"Ø MQTT-Latency:           "
-            f"{mean(kpis['mqtt_latencies']):.3f}s")
+    print(f"\n Cycle times")
+    cs = kpis["cycle_stats"]
+    print(f"   Ø per cycle:              {cs['avg']:.2f} s")
+    print(f"   Min / Max:                {cs['min']:.2f} s / {cs['max']:.2f} s")
+    print(f"   Standard deviation:       {cs['std']:.2f} s")
 
-    print("\n----------- Actions -----------")
-    for action, s in sorted(
-        kpis["action_stats"].items(),
-        key=lambda x: x[1]["avg"],
-        reverse=True):
-        print(f"{action:40s} "
-            f"avg={s['avg']:6.2f}s "
-            f"std={s['std']:5.2f}s "
-            f"max={s['max']:6.2f}s")
+    print(f"\n Phase durations")
+    for phase, stats in kpis["phase_stats"].items():
+        if stats["count"] > 0:
+            print(f"   {phase:20s}  Ø {stats['avg']:6.2f} s  "
+                  f"(min {stats['min']:.2f}, max {stats['max']:.2f}, "
+                  f"σ {stats['std']:.2f})")
+
+    print(f"\n Color distribution")
+    for color, count in sorted(kpis["color_distribution"].items(),
+                               key=lambda x: -x[1]):
+        pct = count / kpis["total_cycles"] * 100 if kpis["total_cycles"] else 0
+        print(f"   {color:15s}  {count:3d}  ({pct:5.1f}%)")
+
+    print("\n" + "=" * 60)
 
 
-def plot_action_averages(kpis, outdir):
+def plot_cycle_durations(kpis, outdir):
     '''
-    Bar chart of the average duration of each action to identify bottlenecks.
+    Line plot of cycle durations, showing each cycle and the average duration as a dashed line.
     '''
-    stats = kpis["action_stats"]
-    actions = list(stats.keys())
-    averages = [
-        stats[a]["avg"]
-        for a in actions
-    ]
+    cycles = kpis["cycles"]
+    durations = [c.get("total_duration", 0) for c in cycles if c.get("total_duration")]
 
-    plt.figure(figsize=(12, 6))
-    plt.barh(actions, averages)
-    plt.xlabel("Average duration [s]")
-    plt.title("Average duration of each action")
-    plt.grid(axis="x", linestyle="--", alpha=0.4)
+    if not durations:
+        return
+
+    plt.figure(figsize=(12, 5))
+    plt.plot(range(1, len(durations) + 1), durations, marker="o", linewidth=1, markersize=4)
+    plt.axhline(mean(durations), color="red", linestyle="--", label=f"Ø {mean(durations):.2f}s")
+    plt.xlabel("Cycle")
+    plt.ylabel("Duration [s]")
+    plt.title("Duration per Cycle")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    path = outdir / "action_averages.png"
+
+    path = outdir / "cycle_durations.png"
     plt.savefig(path, dpi=150)
+    plt.close()
+    print(f"   → {path}")
 
-    print(f"Saved: {path}")
 
-
-def plot_run_durations(kpis, outdir):
+def plot_phase_comparison(kpis, outdir):
     '''
-    Line plot of the run durations to show the trend over multiple runs.
+    Bar chart: Comparison of phase durations.
     '''
-    durations = kpis["run_durations"]
-    runs = list(range(1, len(durations) + 1))
+    phases = []
+    avgs = []
+    stds = []
+
+    for phase in ["pickplace", "colorsensor", "sorter"]:
+        stats = kpis["phase_stats"].get(phase, {})
+        if stats.get("count", 0) > 0:
+            phases.append(phase)
+            avgs.append(stats["avg"])
+            stds.append(stats["std"])
+
+    if not phases:
+        return
 
     plt.figure(figsize=(10, 5))
-    plt.plot(runs, durations, marker="o")
-    plt.xlabel("Run")
+    bars = plt.bar(phases, avgs, yerr=stds, capsize=5, color=["#3498db", "#2ecc71", "#e74c3c"])
     plt.ylabel("Duration [s]")
-    plt.title("Duration of each run")
-    plt.grid(True, linestyle="--", alpha=0.4)
+    plt.title("Average Duration per Phase")
+    plt.grid(axis="y", alpha=0.3)
+
+    for bar, avg in zip(bars, avgs):
+        plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5,
+                 f"{avg:.2f}s", ha="center", va="bottom", fontsize=10)
+
     plt.tight_layout()
-    path = outdir / "run_durations.png"
+    path = outdir / "phase_comparison.png"
     plt.savefig(path, dpi=150)
+    plt.close()
+    print(f"   → {path}")
 
-    print(f"Saved: {path}")
 
-def plot_boxplot_actions(kpis, outdir):
+def plot_phase_breakdown(kpis, outdir):
     '''
-    Boxplot of the action durations to show the distribution and outliers.
+    Stacked bar chart: Time distribution per cycle.
+    '''
+    cycles = kpis["cycles"]
+
+    pickplace = [c.get("pickplace_duration", 0) or 0 for c in cycles]
+    colorsensor = [c.get("colorsensor_duration", 0) or 0 for c in cycles]
+    sorter = [c.get("sorter_duration", 0) or 0 for c in cycles]
+
+    x = range(1, len(cycles) + 1)
+
+    plt.figure(figsize=(14, 6))
+    plt.bar(x, pickplace, label="Pickplace", color="#3498db")
+    plt.bar(x, colorsensor, bottom=pickplace, label="Colorsensor", color="#2ecc71")
+    plt.bar(x, sorter, bottom=[p + c for p, c in zip(pickplace, colorsensor)],
+            label="Sorter", color="#e74c3c")
+
+    plt.xlabel("Cycle")
+    plt.ylabel("Duration [s]")
+    plt.title("Time Distribution per Cycle")
+    plt.legend()
+    plt.grid(axis="y", alpha=0.3)
+    plt.tight_layout()
+
+    path = outdir / "phase_breakdown.png"
+    plt.savefig(path, dpi=150)
+    plt.close()
+    print(f"   → {path}")
+
+
+def plot_color_distribution(kpis, outdir):
+    '''
+    Pie chart of the color distribution.
+    '''
+    colors = kpis["color_distribution"]
+
+    
+    # None entfernen
+    colors = {
+    k: v for k, v in colors.items()
+    if k not in (None, "", "unknown")
+    }
+
+    if not colors:
+        return
+
+    labels = [str(c) for c in colors.keys()]
+    values = list(colors.values())
+
+    color_map = {
+        "blue": "#3498db",
+        "other": "#e74c3c",
+    }
+    pie_colors = [color_map.get(l, "#bdc3c7") for l in labels]
+
+    plt.figure(figsize=(8, 8))
+    plt.pie(values, labels=labels, autopct="%1.1f%%", colors=pie_colors,
+            startangle=90, explode=[0.02] * len(labels))
+    plt.title("Detected Colors")
+
+    path = outdir / "color_distribution.png"
+    plt.savefig(path, dpi=150)
+    plt.close()
+    print(f"   → {path}")
+
+
+def plot_action_boxplot(kpis, outdir):
+    '''
+    Boxplot of all actions.
     '''
     intervals = kpis["intervals"]
     by_action = defaultdict(list)
@@ -260,81 +371,71 @@ def plot_boxplot_actions(kpis, outdir):
     for iv in intervals:
         by_action[iv["action"]].append(iv["duration"])
 
-    labels = list(by_action.keys())
-    values = [by_action[a] for a in labels]
+    # sort actions by average duration for better visualization
+    sorted_actions = sorted(by_action.keys(), key=lambda a: mean(by_action[a]), reverse=True)
+    values = [by_action[a] for a in sorted_actions]
 
-    plt.figure(figsize=(14, 6))
-    plt.boxplot(values, tick_labels=labels, vert=False)
+    plt.figure(figsize=(14, 8))
+    plt.boxplot(values, vert=False, tick_labels=sorted_actions)
     plt.xlabel("Duration [s]")
-    plt.title("Distribution of the action durations")
-    plt.grid(axis="x", linestyle="--", alpha=0.4)
+    plt.title("Distribution of Action Durations")
+    plt.grid(axis="x", alpha=0.3)
     plt.tight_layout()
 
     path = outdir / "action_boxplot.png"
     plt.savefig(path, dpi=150)
-
-    print(f"Saved: {path}")
-
-
-
-def plot_color_distribution(kpis, outdir):
-    '''
-    Pie chart of the detected colors by the color sensor.
-    '''
-    colors = kpis["color_distribution"]
-
-    if not colors:
-        return
-
-    labels = list(colors.keys())
-    values = list(colors.values())
-
-    plt.figure(figsize=(6, 6))
-    plt.pie(values, labels=labels, autopct="%1.1f%%")
-    plt.title("Color Distribution")
-
-    path = outdir / "color_distribution.png"
-    plt.savefig(path, dpi=150)
-
-    print(f"Saved: {path}")
-
+    plt.close()
+    print(f"   → {path}")
 
 
 def export_csv(kpis, outdir):
     '''
-    Export of the action intervals as CSV for further analysis.
-    '''
-    df = pd.DataFrame(kpis["intervals"])
-    path = outdir / "intervals.csv"
-    df.to_csv(path, index=False)
+    Export cycles and intervals as CSV files for further analysis.'''
+    # Cycles
+    df_cycles = pd.DataFrame(kpis["cycles"])
+    path_cycles = outdir / "cycles.csv"
+    df_cycles.to_csv(path_cycles, index=False)
+    print(f"   → {path_cycles}")
 
-    print(f"CSV saved: {path}")
+    # Intervals
+    df_intervals = pd.DataFrame(kpis["intervals"])
+    path_intervals = outdir / "intervals.csv"
+    df_intervals.to_csv(path_intervals, index=False)
+    print(f"   → {path_intervals}")
 
 
 def main():
-    '''
-    Main function to execute the script.
-    '''
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("logfile", help="Path to the JSONL file")
-    parser.add_argument("--output-dir", "-o", default="report", help="Output directory")
+    parser = argparse.ArgumentParser(description="KPI-Report for Dobot-Logs")
+    parser.add_argument("logfile", help="Path to the JSONL log file")
+    parser.add_argument("--output-dir", "-o", default="report",
+                        help="Output directory (default: report)")
 
     args = parser.parse_args()
     outdir = Path(args.output_dir)
     outdir.mkdir(parents=True, exist_ok=True)
+
+    print(f"\n load log: {args.logfile}")
     events = load_events(args.logfile)
-    runs = split_runs(events)
-    kpis = compute_kpis(runs)
+    print(f"   {len(events)} events loaded")
+
+    cycles = extract_cycles(events)
+    intervals = extract_action_intervals(events)
+    print(f"   {len(cycles)} cycles detected")
+    print(f"   {len(intervals)} action intervals")
+
+    kpis = compute_kpis(cycles, intervals)
     print_report(kpis)
-    export_csv(kpis, outdir)
-    plot_action_averages(kpis, outdir)
-    plot_run_durations(kpis, outdir)
-    plot_boxplot_actions(kpis, outdir)
+
+    plot_cycle_durations(kpis, outdir)
+    plot_phase_comparison(kpis, outdir)
+    plot_phase_breakdown(kpis, outdir)
     plot_color_distribution(kpis, outdir)
-    print("\nReport generated.")
+    plot_action_boxplot(kpis, outdir)
+
+    export_csv(kpis, outdir)
+
+    print(f"\n Report created in: {outdir.absolute()}\n")
 
 
 if __name__ == "__main__":
     main()
-    

@@ -7,11 +7,11 @@ Usage:
 '''
 
 import json
-import sys
+#import sys
 import argparse
 from collections import defaultdict
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
+#import matplotlib.patches as mpatches
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent 
