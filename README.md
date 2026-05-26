@@ -72,36 +72,78 @@ The system processes items through a complete workflow: pick-up → detection �
 
 ### 📖 Usage
 
-**Initialize robot positions**:
+#### Run all scripts together
+
+Start the process 
+
 ```bash
-python homing_dobot.py
+./start_all.sh 
 ```
 
-**Run the pick & place module**:
+Stopp the process
+
 ```bash
-python dobot_pickplace.py
+./start_all.sh stop
+```
+
+Status of the process
+
+```bash
+./start_all.sh status
+```
+
+#### Run each script and 
+
+**Initialize robot positions**:
+```bash
+source ~/venv/bin/activate
+python homing_dobot.py
 ```
 
 **Run the color sensor module**:
 ```bash
 cd color_scanner
+source ~/venv/bin/activate
 python color_scanner.py
+```
+
+**Run the pick & place module**:
+```bash
+source ~/venv/bin/activate
+python dobot_pickplace.py
 ```
 
 **Run the sorting module**:
 ```bash
+source ~/venv/bin/activate
 python dobot_sorter.py
 ```
 
 **Start the central controller** (main orchestration):
 ```bash
+source ~/venv/bin/activate
 python controller.py
 ```
 
+If you need to refine the positions for the Dobots, use this interactive notebook to adjust them.
 
 **Define custom positions** (interactive):
 ```bash
 jupyter notebook define_positions.ipynb
+```
+
+### Get the Gantt Chart
+
+To get the gantt chart of your process, run the following command in your terminal (you have to change the name of the log file):
+```bash
+python scripts/create_gantt.py logs/dobot_log_2026-05-19.jsonl --output gantt.png
+```
+
+### Get KPI and diagrams
+
+To get the KPI and diagrams of your process, run the following command in your terminal (you have to change the name of the log file):
+```bash
+python scripts/generate_kpi.py logs/dobot_log_2026-05-19.jsonl 
 ```
 
 ## 🏗️ Project Structure
