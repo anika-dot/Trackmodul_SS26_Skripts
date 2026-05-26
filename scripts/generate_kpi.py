@@ -278,7 +278,7 @@ def plot_phase_comparison(kpis, outdir):
         return
 
     plt.figure(figsize=(10, 5))
-    bars = plt.bar(phases, avgs, yerr=stds, capsize=5, color=["#3498db", "#2ecc71", "#e74c3c"])
+    bars = plt.bar(phases, avgs, yerr=stds, capsize=5, color=["#1a80bb", "#ea801c", "#b8b8b8"])
     plt.ylabel("Duration [s]")
     plt.title("Average Duration per Phase")
     plt.grid(axis="y", alpha=0.3)
@@ -307,10 +307,10 @@ def plot_phase_breakdown(kpis, outdir):
     x = range(1, len(cycles) + 1)
 
     plt.figure(figsize=(14, 6))
-    plt.bar(x, pickplace, label="Pickplace", color="#3498db")
-    plt.bar(x, colorsensor, bottom=pickplace, label="Colorsensor", color="#2ecc71")
+    plt.bar(x, pickplace, label="Pickplace", color="#1a80bb")
+    plt.bar(x, colorsensor, bottom=pickplace, label="Colorsensor", color="#ea801c")
     plt.bar(x, sorter, bottom=[p + c for p, c in zip(pickplace, colorsensor)],
-            label="Sorter", color="#e74c3c")
+            label="Sorter", color="#b8b8b8")
 
     plt.xlabel("Cycle")
     plt.ylabel("Duration [s]")
@@ -345,8 +345,8 @@ def plot_color_distribution(kpis, outdir):
     values = list(colors.values())
 
     color_map = {
-        "blue": "#3498db",
-        "other": "#e74c3c",
+        "blue": "#1a80bb",
+        "other": "#b8b8b8",
     }
     pie_colors = [color_map.get(l, "#bdc3c7") for l in labels]
 
