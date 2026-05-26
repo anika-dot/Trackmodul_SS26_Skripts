@@ -390,7 +390,8 @@ def plot_action_boxplot(kpis, outdir):
 
 def export_csv(kpis, outdir):
     '''
-    Export cycles and intervals as CSV files for further analysis.'''
+    Export cycles and intervals as CSV files for further analysis.
+    '''
     # Cycles
     df_cycles = pd.DataFrame(kpis["cycles"])
     path_cycles = outdir / "cycles.csv"
@@ -405,6 +406,9 @@ def export_csv(kpis, outdir):
 
 
 def main():
+    '''
+    Main function to parse arguments, load data, compute KPIs, and generate report and visualizations.
+    '''
     parser = argparse.ArgumentParser(description="KPI-Report for Dobot-Logs")
     parser.add_argument("logfile", help="Path to the JSONL log file")
     parser.add_argument("--output-dir", "-o", default="report",
