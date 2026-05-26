@@ -163,11 +163,15 @@ python scripts/generate_kpi.py logs/dobot_log_2026-05-19.jsonl
 │   └── dobot_pickplace.py        # pick & place operations
 │   └── homing_dobot.py           # robot initialization script
 │   └── create_gantt.py	        	# create gantt chart
+│   └── generate_kpi.py           # generate kpi for a run
 ├── color_scanner/                # color detection module
 │   └── scan_color.py			        # scan color
 │   └── requirements.txt
-├── logs/                         # Log files
-├── requirements.txt              # Python dependencies
+├── logs/                         # log files
+├── report/                       # report files
+├── start_all.sh                  # file to start the whole process as one
+├── pyproject.toml                # define project and define dependencies
+├── requirements.txt              # python dependencies
 └── README.md 
 ```
 
