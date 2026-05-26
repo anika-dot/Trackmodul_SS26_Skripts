@@ -23,7 +23,6 @@ def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
     topic = msg.topic
 
-    print(f"[RECV] {topic} -> {data}")
     log.info("mqtt_received", topic=topic, payload=data)
 
     if topic == "trackmodul_ah_SS26/dobot/pickplace/status" and state == "WAIT_D_pickplace":
@@ -35,8 +34,6 @@ def on_message(client, userdata, msg):
     elif topic == "trackmodul_ah_SS26/dobot/colorsensor/status" and state == "WAIT_D_color_sensor":
         log.end("colorsensor_total")
         detected_color = data.get("color")
-
-        print(f"Detected color: {detected_color}") # To Do: Delete print statement
         log.info("color_detected", color=detected_color)
 
         if detected_color == "blue":
