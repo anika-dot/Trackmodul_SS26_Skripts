@@ -131,7 +131,155 @@ def extract_action_intervals(events):
     return intervals
 
 
-def compute_kpis(cycles, intervals):
+def extract_latencies(events, intervals):
+    '''
+    Extract various latency metrics from the event stream.
+    '''''
+    latencies = {
+        "command_dispatch_pickplace": [],
+        "command_dispatch_sorter": [],
+        "inter_action": [],   
+        "sensor_reaction": [],
+        "task_handoff": [],
+        "phase_overhead": [],
+    }
+
+    # Command dispatch latency (controller dispatch to pickplace receiving the task)
+    pending_dispatch = None
+    for ev in events:
+        if (ev.get("event") == "action_start"
+                and ev.get("component") == "controller"
+                and ev.get("action") == "pickplace_total"):
+            pending_dispatch = ev["ts"]
+        elif (ev.get("event") == "task_received"
+              and ev.get("component") == "pickplace"
+              and pending_dispatch is not None):
+            latencies["command_dispatch_pickplace"].append({
+                "ts": ev["ts"],
+                "latency": ev["ts"] - pending_dispatch,
+            })
+            pending_dispatch = None
+
+    # Command dispatch latency (controller dispatch to sorter receiving the task)
+    pending_dispatch = None
+    for ev in events:
+        if (ev.get("event") == "action_start"
+                and ev.get("component") == "controller"
+                and ev.get("action") == "sorter_total"):
+            pending_dispatch = ev["ts"]
+        elif (ev.get("event") == "sorter_start"
+              and ev.get("component") == "sorter"
+              and pending_dispatch is not None):
+            latencies["command_dispatch_sorter"].append({
+                "ts": ev["ts"],
+                "latency": ev["ts"] - pending_dispatch,
+            })
+            pending_dispatch = None
+
+    #Inter-action latency per component (action_end → next action_start in same component)
+    by_component = defaultdict(list)
+    for ev in events:
+        if ev.get("event") in ("action_start", "action_end"):
+            by_component[ev.get("component")].append(ev)
+
+    for component, evs in by_component.items():
+        evs_sorted = sorted(evs, key=lambda e: e["ts"])
+        last_end = None
+        for ev in evs_sorted:
+            if ev["event"] == "action_end":
+                last_end = ev
+            elif ev["event"] == "action_start" and last_end is not None:
+                gap = ev["ts"] - last_end["ts"]
+                latencies["inter_action"].append({
+                    "component": component,
+                    "after_action": last_end.get("action"),
+                    "before_action": ev.get("action"),
+                    "ts": ev["ts"],
+                    "latency": gap,
+                })
+                last_end = None
+
+    # Sensor reaction latency (IR sensor or color detected → next action_start in same component)
+    sensor_events = {"object_detected_by_ir_sensor", "color_detected"}
+    pending_sensor = None
+    for ev in events:
+        if ev.get("event") in sensor_events:
+            pending_sensor = ev
+        elif (ev.get("event") == "action_start"
+              and pending_sensor is not None
+              and ev.get("component") == pending_sensor.get("component")):
+            latencies["sensor_reaction"].append({
+                "sensor_event": pending_sensor["event"],
+                "next_action": ev.get("action"),
+                "ts": ev["ts"],
+                "latency": ev["ts"] - pending_sensor["ts"],
+            })
+            pending_sensor = None
+    
+    # Task handoff latency (task_finished → next component's action_start)
+    pending_task_finished = None
+    for ev in events:
+        if ev.get("event") == "task_finished":
+            pending_task_finished = ev
+        elif (ev.get("event") == "action_start"
+              and pending_task_finished is not None
+              and ev.get("component") != pending_task_finished.get("component")):
+            latencies["task_handoff"].append({
+                "from_component": pending_task_finished.get("component"),
+                "to_component": ev.get("component"),
+                "ts": ev["ts"],
+                "latency": ev["ts"] - pending_task_finished["ts"],
+            })
+            pending_task_finished = None
+
+    # Phase overhead (*_total duration minus sum of sub-actions)
+    total_intervals = [iv for iv in intervals if iv["action"].endswith("_total")]
+    for total in total_intervals:
+        component_name = total["action"].replace("_total", "")
+        subs = [iv for iv in intervals
+                if iv["component"] == component_name
+                and total["start"] <= iv["start"] < total["end"]
+                and not iv["action"].endswith("_total")]
+        sub_sum = sum(iv["duration"] for iv in subs)
+        overhead = total["duration"] - sub_sum
+        latencies["phase_overhead"].append({
+            "phase": total["action"],
+            "total_duration": total["duration"],
+            "sub_sum": sub_sum,
+            "overhead": overhead,
+        })
+
+    return latencies
+
+
+def compute_latency_stats(latencies):
+    '''
+    Compute statistics for latency metrics.
+    '''
+    stats = {}
+    for name, entries in latencies.items():
+        if name == "phase_overhead":
+            values = [e["overhead"] for e in entries]
+        else:
+            values = [e["latency"] for e in entries]
+
+        if not values:
+            stats[name] = None
+            continue
+
+        stats[name] = {
+            "count": len(values),
+            "avg": mean(values),
+            "min": min(values),
+            "max": max(values),
+            "p50": sorted(values)[len(values)//2],
+            "p95": sorted(values)[int(len(values)*0.95)] if len(values) >= 20 else max(values),
+            "std": stdev(values) if len(values) > 1 else 0,
+        }
+    return stats
+
+
+def compute_kpis(cycles, intervals, events):
     ''''
     Compute KPI from the extracted cycles and intervals.
     '''
@@ -186,6 +334,9 @@ def compute_kpis(cycles, intervals):
 
     success_rate = ((len(cycles) - errors) / len(cycles) * 100) if cycles else 0
 
+    latencies = extract_latencies(events, intervals)
+    latency_stats = compute_latency_stats(latencies)
+
     return {
         "total_cycles": len(cycles),
         "total_runtime": sum(cycle_totals),
@@ -200,6 +351,8 @@ def compute_kpis(cycles, intervals):
         "errors": errors,
         "cycles": cycles,
         "intervals": intervals,
+        "latencies": latencies,
+        "latency_stats": latency_stats
     }
 
 
@@ -236,6 +389,13 @@ def print_report(kpis):
                                key=lambda x: -x[1]):
         pct = count / kpis["total_cycles"] * 100 if kpis["total_cycles"] else 0
         print(f"   {color:15s}  {count:3d}  ({pct:5.1f}%)")
+
+    print(f"\n Latency metrics")
+    for name, stats in kpis["latency_stats"].items():
+        if stats:
+            print(f"   {name:30s}  Ø {stats['avg']*1000:6.2f} ms  "
+                  f"(min {stats['min']*1000:.2f} ms, max {stats['max']*1000:.2f} ms, "
+                  f"σ {stats['std']*1000:.2f} ms)")
 
     print("\n" + "=" * 60)
 
@@ -445,6 +605,38 @@ def plot_gantt(kpis, outdir):
     print(f"   → {path}")
 
 
+def plot_latencies(latencies, outdir):
+    '''
+    Boxplot of latency metrics.
+    '''
+    data = []
+    labels = []
+    for name, entries in latencies.items():
+        if name == "phase_overhead":
+            values = [e["overhead"] for e in entries]
+        else:
+            values = [e["latency"] * 1000 for e in entries]  # in ms
+        if values:
+            data.append(values)
+            labels.append(name)
+
+    if not data:
+        return
+
+    plt.figure(figsize=(12, 6))
+    plt.boxplot(data, tick_labels=labels, vert=False)
+    plt.xlabel("Latency [ms]")
+    plt.title("Latency Distribution")
+    plt.grid(axis="x", alpha=0.3)
+    plt.xscale("log")  # log scale for better visibility of small latencies
+    plt.tight_layout()
+    path = outdir / "latencies.png"
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+    print(f"   → {path}")   
+
+
 def export_csv(kpis, outdir):
     '''
     Export cycles and intervals as CSV files for further analysis.
@@ -484,7 +676,7 @@ def main():
     print(f"   {len(cycles)} cycles detected")
     print(f"   {len(intervals)} action intervals")
 
-    kpis = compute_kpis(cycles, intervals)
+    kpis = compute_kpis(cycles, intervals, events)
     print_report(kpis)
 
     plot_cycle_durations(kpis, outdir)
@@ -493,7 +685,7 @@ def main():
     plot_color_distribution(kpis, outdir)
     plot_action_boxplot(kpis, outdir)
     plot_gantt(kpis, outdir)
-
+    plot_latencies(kpis["latencies"], outdir)
     export_csv(kpis, outdir)
 
     print(f"\n Report created in: {outdir.absolute()}\n")
