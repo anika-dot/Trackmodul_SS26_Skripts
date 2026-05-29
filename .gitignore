@@ -21,4 +21,5 @@ scripts/report
 # log files
 logs/
 scripts/logs/
+scripts/report/
 color_scanner/logs/
