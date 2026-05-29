@@ -1,0 +1,116 @@
+'''
+Module to create a Streamlit dashboard for visualizing KPIs from Dobot logs.
+'''
+
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from generate_kpi import (
+    load_events,
+    extract_cycles,
+    extract_action_intervals,
+    compute_kpis
+)
+
+st.set_page_config(
+    page_title="Dobot KPI Dashboard",
+    layout="wide"
+)
+
+st.title("Dobot KPI Dashboard")
+
+uploaded_file = st.file_uploader(
+    "Upload JSONL Log File",
+    type=["jsonl"]
+)
+
+if uploaded_file:
+
+    # save uploaded file to disk for processing
+    with open("temp.jsonl", "wb") as f:
+        f.write(uploaded_file.read())
+
+    events = load_events("temp.jsonl")
+    cycles = extract_cycles(events)
+    intervals = extract_action_intervals(events)
+    kpis = compute_kpis(cycles, intervals, events)
+
+    # KPI Cards
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.metric("Cycles", kpis["total_cycles"])
+    col2.metric("Runtime", f"{kpis['total_runtime']:.2f}s")
+    col3.metric("Success Rate", f"{kpis['success_rate']:.1f}%")
+    col4.metric("Errors", kpis["errors"])
+
+    st.divider()
+
+    # Cycle durations
+    st.subheader("Cycle Durations")
+
+    durations = [
+        c["total_duration"]
+        for c in kpis["cycles"]
+        if c.get("total_duration")
+    ]
+
+    fig, ax = plt.subplots(figsize=(10, 4))
+
+    ax.plot(
+        range(1, len(durations)+1),
+        durations,
+        marker="o"
+    )
+
+    ax.set_xlabel("Cycle")
+    ax.set_ylabel("Duration [s]")
+    ax.grid(True)
+
+    st.pyplot(fig)
+
+    # Phase stats table
+    st.subheader("Phase Statistics")
+
+    df_phase = pd.DataFrame(kpis["phase_stats"]).T
+    st.dataframe(df_phase)
+
+    # Color distribution
+    st.subheader("Color Distribution")
+
+    df_colors = pd.DataFrame(
+        list(kpis["color_distribution"].items()),
+        columns=["Color", "Count"]
+    )
+
+    st.bar_chart(df_colors.set_index("Color"))
+
+    # Gantt chart of actions (interactive with hover info)
+    st.subheader("Action Timeline")
+    fig, ax = plt.subplots(figsize=(12, 1.2 + 0.8 * len(set(iv["component"] for iv in intervals))))
+    # (reuse the plot_gantt function from create_gantt.py, but adapted for Streamlit)
+    # one color per component, cycling through a colormap
+    components = sorted({iv["component"] for iv in intervals})
+    comp_y = {c: i for i, c in enumerate(components)}
+    cmap = plt.get_cmap("tab10")
+    comp_color = {c: cmap(i % 10) for i, c in enumerate(components)}
+    for iv in intervals:
+        y = comp_y[iv["component"]]
+        x_start = iv["start"] - kpis["cycles"][0]["start_ts"]
+        width = max(iv["duration"], 0.05)  # min width for visibility
+        ax.barh(
+            y=y, width=width, left=x_start, height=0.6,
+            color=comp_color[iv["component"]],
+            edgecolor="black", linewidth=0.5,
+        )
+        label = f"{iv['action']} ({iv['duration']:.1f}s)"
+        ax.text(
+            x_start + width / 2, y, label,
+            ha="center", va="center", fontsize=8, color="white",
+            clip_on=True,
+        )
+    ax.set_yticks(list(comp_y.values()))
+    ax.set_yticklabels(list(comp_y.keys()))
+    ax.set_xlabel("Time [s]")
+    st.pyplot(fig)
+
