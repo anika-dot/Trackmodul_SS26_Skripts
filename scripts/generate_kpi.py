@@ -1,5 +1,5 @@
 '''
-Generate kpi report and visualizations from the dobot log file.
+This module generates a kpi report and visualizations from the dobot log file.
 
 Usage:
     python generate_kpi.py logs/dobot_log.jsonl
