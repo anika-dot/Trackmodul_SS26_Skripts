@@ -1,5 +1,5 @@
 '''
-Generate kpi report and visualizations from the dobot log file.
+This module generates a kpi report and visualizations from the dobot log file.
 
 Usage:
     python generate_kpi.py logs/dobot_log.jsonl
@@ -16,9 +16,9 @@ import matplotlib.pyplot as plt
 
 
 COMPONENT_COLORS = {
-    "controller": "#1abb58",
-    "pickplace": "#1a80bb",
-    "sorter": "#b8b8b8",
+    "controller": "#6E706E",
+    "pickplace": "#BE5108",
+    "sorter": "#4A8522",
 }
 
 
@@ -445,7 +445,7 @@ def plot_phase_comparison(kpis, outdir):
         return
 
     plt.figure(figsize=(10, 5))
-    bars = plt.bar(phases, avgs, yerr=stds, capsize=5, color=["#1a80bb", "#ea801c", "#b8b8b8"])
+    bars = plt.bar(phases, avgs, yerr=stds, capsize=5, color=["#BE5108", "#D89900", "#4A8522"])
     plt.ylabel("Duration [s]")
     plt.title("Average Duration per Phase")
     plt.grid(axis="y", alpha=0.3)
@@ -474,10 +474,10 @@ def plot_phase_breakdown(kpis, outdir):
     x = range(1, len(cycles) + 1)
 
     plt.figure(figsize=(14, 6))
-    plt.bar(x, pickplace, label="Pickplace", color="#1a80bb")
-    plt.bar(x, colorsensor, bottom=pickplace, label="Colorsensor", color="#ea801c")
+    plt.bar(x, pickplace, label="Pickplace", color="#BE5108")
+    plt.bar(x, colorsensor, bottom=pickplace, label="Colorsensor", color="#D89900")
     plt.bar(x, sorter, bottom=[p + c for p, c in zip(pickplace, colorsensor)],
-            label="Sorter", color="#b8b8b8")
+            label="Sorter", color="#4A8522")
 
     plt.xlabel("Cycle")
     plt.ylabel("Duration [s]")
