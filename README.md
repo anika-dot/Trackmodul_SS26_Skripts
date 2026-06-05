@@ -1,6 +1,6 @@
 # Trackmodul_SS26_Skripts
 
-A Python-based automation system for coordinating two Dobot robotic arms in a sorting and handling workflow using MQTT messaging protocol. The setup contains a RaspberryPi, two Dobot Magician, a conveyor belt, a light barrier and a color sensor. 
+A Python-based automation system for coordinating two Dobot robotic arms in a sorting and handling workflow using MQTT messaging protocol. The setup contains a RaspberryPi, two Dobot Magician robots, a conveyor belt, a light barrier, and a color sensor.
 
 ## 💡 Overview
 
@@ -22,10 +22,14 @@ The system processes items through a complete workflow: pick-up → detection �
 - **Safe Movement** - Protected movement commands with simple error handling
 - **State Machine Control** - Robust workflow management with state tracking
 
+### Known limitation:
+- The color sensor currently distinguishes only between blue and non-blue objects. 
+- The public HiveMQ MQTT broker provides no authentication — all messages are visible to anyone using the same topic prefix.
+
 ## 👩‍💻 Tech Stack
 
 - **Language**: Python 3
-- **Primary Library**: 
+- **Libraries**: 
   - `dobotapi` - Dobot robot control
   - `pydobotplus` - Extended Dobot functionality for color sensor
   - `paho-mqtt` - MQTT client for message brokering
@@ -35,21 +39,39 @@ The system processes items through a complete workflow: pick-up → detection �
 - **Communication**: Public MQTT Broker (HiveMQ)
 - **Platforms**: VisualStudioCode
 - **Hardware**:
-  - Dobot Magician with gripper arm, conveyor belt, light barrier and color sensor
-  - RaspberryPi
-
-### Set-up
-
-- Dobot "Pickplace" with conveyor belt and light barrier
-- Dobot "Sorter" with color sensor
-- both Dobots connected to the same RaspberryPi
+- Dobot Magician "Pickplace" — with gripper arm, conveyor belt, and light barrier
+- Dobot Magician "Sorter" — with gripper arm and color sensor
+- RaspberryPi (both Dobots connected via USB)
 
 ## 📦 Getting Started
 
 ### 🚀 Prerequisites
 
 - Python 3.7+
-- Hardware
+- RaspberryPi (tested on RaspberryPi OS)
+- Both Dobot Magician robots connected to the same Raspberry Pi
+- Jupyter Notebook (for position definition notebooks): `pip install notebook`
+
+### 🔌 Hardware Setup
+Connect both Dobots to the Raspberry Pi via USB. Check which serial port each Dobot is assigned to:
+
+```bash
+ls /dev/ttyUSB*
+```
+
+Typical assignment (may vary):
+| Dobot | Port |
+|-------|------|
+| Pickplace | `/dev/ttyUSB0` |
+| Sorter | `/dev/ttyUSB1` |
+
+Update the serial port configuration in the respective scripts (`dobot_pickplace.py`, `dobot_sorter.py`) if your assignment differs.
+
+### ⚙️ Configuration
+The project uses a YAML-based configuration. Before running, verify the following in your config file:
+- Serial ports for each Dobot
+- MQTT broker address and topic prefix (`trackmodul_ah_SS26/...`)
+- Pick, place, and sort positions (see `define_positions.ipynb`)
 
 ### 🛠️ Installation
 
@@ -59,84 +81,92 @@ The system processes items through a complete workflow: pick-up → detection �
    cd Trackmodul_SS26_Skripts
    ```
 
-2. **Install dependencies**
+2. **Create and activate a virtual environment**
+   ```bash
+   python3 -m venv ~/venv
+   source ~/venv/bin/activate
+   ```
+
+3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **For color scanner module (optional)**
+4. **For the color scanner module**
    ```bash
    cd color_scanner
    pip install -r requirements.txt
+   cd ..
    ```
 
 ### 📖 Usage
 
-#### Run all scripts together
-
-Start the process 
+#### Run everything at once (recommended)
 
 ```bash
-./start_all.sh 
-```
+# Start all components
+./start_all.sh
 
-Stopp the process
-
-```bash
+# Stop all components
 ./start_all.sh stop
-```
 
-Status of the process
-
-```bash
+# Check status
 ./start_all.sh status
 ```
 
-#### Run each script and 
+#### Run each component individually
 
-**Initialize robot positions**:
+Always activate the virtual environment first:
+
 ```bash
 source ~/venv/bin/activate
-python homing_dobot.py
 ```
 
-**Run the color sensor module**:
+**1. Initialize robot positions** (run once before first use):
+```bash
+python scripts/homing_dobot.py
+```
+
+**2. Start the color sensor module**:
 ```bash
 cd color_scanner
-source ~/venv/bin/activate
-python color_scanner.py
+python scan_color.py
+cd ..
 ```
 
-**Run the pick & place module**:
+**3. Start the pick & place module**:
 ```bash
-source ~/venv/bin/activate
-python dobot_pickplace.py
+python scripts/dobot_pickplace.py
 ```
 
-**Run the sorting module**:
+**4. Start the sorting module**:
 ```bash
-source ~/venv/bin/activate
-python dobot_sorter.py
+python scripts/dobot_sorter.py
 ```
 
-**Start the central controller** (main orchestration):
+**5. Start the central controller** (main orchestration — start this last):
 ```bash
-source ~/venv/bin/activate
-python controller.py
+python scripts/controller.py
 ```
 
-If you need to refine the positions for the Dobots, use this interactive notebook to adjust them.
+#### Define custom positions
 
-**Define custom positions** (interactive):
+Use the interactive notebook to adjust robot positions:
+
 ```bash
-jupyter notebook define_positions.ipynb
+jupyter notebook instructions/define_positions.ipynb
 ```
 
-### Get the Gantt Chart
+#### Generate analysis outputs
 
-To get the gantt chart of your process, run the following command in your terminal (you have to change the name of the log file):
+After a run, replace the log filename with your actual file:
+
 ```bash
+# Gantt chart
 python scripts/create_gantt.py logs/dobot_log_2026-05-19.jsonl --output gantt.png
+
+# KPI report and diagrams (saved to report/)
+python scripts/generate_kpi.py logs/dobot_log_2026-05-19.jsonl
 ```
 
 ### Get KPI and diagrams
@@ -149,74 +179,74 @@ python scripts/generate_kpi.py logs/dobot_log_2026-05-19.jsonl
 ## 🏗️ Project Structure
 
 ```
-├── helper_functions/             # helper module
-│   └── dobot_functions.py        # shared Dobot utility functions, import dobotmaster.lib.dobot
-│   └── mqtt_handler.py           # MQTT communication utilities
-│   └── event_logger.py           # event logger
-│   └── dobotmaster/              # Dobot API integration layer
-├── instructions/                 # instructions module
-│   └── homing_dobot.ipynb        # interactive homing notebook
-│   └── define_positions.ipynb    # position definition notebook
-├── scripts/             		      # scripts module
-│   └── controller.py             # central workflow orchestrator
-│   └── dobot_sorter.py           # sorting logic with gripper control
-│   └── dobot_pickplace.py        # pick & place operations
-│   └── homing_dobot.py           # robot initialization script
-│   └── create_gantt.py	        	# create gantt chart
-│   └── generate_kpi.py           # generate kpi for a run
-├── color_scanner/                # color detection module
-│   └── scan_color.py			        # scan color
-│   └── requirements.txt
-├── logs/                         # log files
-├── report/                       # report files
-├── start_all.sh                  # file to start the whole process as one
-├── pyproject.toml                # define project and define dependencies
-├── requirements.txt              # python dependencies
-└── README.md 
+├── helper_functions/            # Shared utilities
+│   ├── dobot_functions.py       # Shared Dobot utility functions
+│   ├── mqtt_handler.py          # MQTT communication utilities
+│   ├── event_logger.py          # Event logger (outputs to logs/)
+│   └── dobotmaster/             # Dobot API integration layer
+├── instructions/                # Developer tools (interactive notebooks)
+│   ├── homing_dobot.ipynb       # Interactive homing guide
+│   └── define_positions.ipynb   # Position definition and tuning
+│   └── set_up_raspberrypi.ipynb # Set-up RaspberryPi
+│   └── test_color_scan.ipynb    # Test the color scanner
+├── scripts/                     # Main runnable scripts
+│   ├── controller.py            # Central workflow orchestrator
+│   ├── dobot_sorter.py          # Sorting logic with gripper control
+│   ├── dobot_pickplace.py       # Pick & place operations
+│   ├── homing_dobot.py          # Robot initialization (run once)
+│   ├── dashboard.py             # Generate Dashboard from log
+│   └── generate_kpi.py          # Generate KPIs and diagrams from log
+├── color_scanner/               # Color detection module
+│   ├── scan_color.py            # Color scan logic
+│   └── requirements.txt         # Color scanner dependencies
+├── logs/                        # Auto-generated JSONL log files
+├── report/                      # Auto-generated KPI outputs (charts, summaries)
+├── start_all.sh                 # Start/stop/status for all components
+├── pyproject.toml               # Project metadata and dependencies
+├── requirements.txt             # Python dependencies
+└── README.md
 ```
+
+**Note:** The `instructions/` folder contains developer notebooks for setup and calibration, not part of the regular runtime workflow.
 
 ## 🔄 Workflow
 
-The system operates as a state machine with the following workflow:
+TThe system operates as a state machine:
 
-1. **INIT → WAIT_D_pickplace**: Controller starts pick & place operation
-2. **WAIT_D_pickplace → WAIT_D_color_sensor**: Item picked up, now scan color
-3. **WAIT_D_color_sensor → WAIT_D_Sorter**: Color detected, sort accordingly
-4. **WAIT_D_Sorter → DONE**: Sorting complete, cycle finishes
+```
+INIT → WAIT_D_pickplace → WAIT_D_color_sensor → WAIT_D_Sorter → DONE
+```
 
-Each operation is logged with timing information for performance analysis.
+1. **INIT → WAIT_D_pickplace** — Controller triggers pick & place operation
+2. **WAIT_D_pickplace → WAIT_D_color_sensor** — Item picked up; color scan starts
+3. **WAIT_D_color_sensor → WAIT_D_Sorter** — Color detected; sort command sent
+4. **WAIT_D_Sorter → DONE** — Sorting complete; cycle finishes and restarts
+
+Each operation is logged with timestamps to `logs/` for later analysis.
 
 ## 📡 MQTT Topics
 
-- `trackmodul_ah_SS26/dobot/pickplace/command` - Pick & place commands
-- `trackmodul_ah_SS26/dobot/pickplace/status` - Pick & place status
-- `trackmodul_ah_SS26/dobot/colorsensor/command` - Color sensor commands
-- `trackmodul_ah_SS26/dobot/colorsensor/status` - Color sensor status (includes detected color)
-- `trackmodul_ah_SS26/dobot/sorter/command` - Sort commands (blue/other)
-- `trackmodul_ah_SS26/dobot/sorter/status` - Sorter completion status
+
+| Topic | Direction | Description |
+|-------|-----------|-------------|
+| `trackmodul_ah_SS26/dobot/pickplace/command` | Controller → Pickplace | Start pick & place |
+| `trackmodul_ah_SS26/dobot/pickplace/status` | Pickplace → Controller | Done / error |
+| `trackmodul_ah_SS26/dobot/colorsensor/command` | Controller → Sensor | Start color scan |
+| `trackmodul_ah_SS26/dobot/colorsensor/status` | Sensor → Controller | Detected color |
+| `trackmodul_ah_SS26/dobot/sorter/command` | Controller → Sorter | Sort `blue` or `other` |
+| `trackmodul_ah_SS26/dobot/sorter/status` | Sorter → Controller | Sort complete |
 
 ## 🐛 Issues
 
-If you encounter any issues while using or setting up the project, please check the [Issues section](https://github.com/anika-dot/Trackmodul_SS26_Skripts/issues) to see if it has already been reported. If not, feel free to open a new issue detailing the problem.
+Check the `logs/` directory and `EventLogger` output first — most issues are logged with timestamps.
 
-### When reporting an issue, please include:
+**Dobot not connecting?** Verify the serial port with `ls /dev/ttyUSB*` and update the config accordingly.
 
-- A clear and descriptive title
-- A detailed description of the problem
-- Steps to reproduce the issue
-- Any relevant logs or error messages (check `EventLogger` output)
-- Screenshots of the error (if applicable)
-- System information:
-  - Operating System and version
-  - Python version
-  - Dobot model and firmware version
-  - Serial port information
-  - MQTT broker status
+**Wrong positions?** Use the interactive notebooks:
+- Position calibration: `instructions/define_positions.ipynb`
+- Homing issues: `instructions/homing_dobot.ipynb`
 
-### Issues with the Dobot positions
-
-You can find a guide to hanlde Dobot positions here: define_positions.ipynb 
-If you encounter problems with the homing position of the Dobot, you can take a look at this notebook: homing_dobot.ipynb. In the guide you will find detailed information how to reset the dobot home position and change it. 
+For other issues, open a ticket in the [Issues section](https://github.com/anika-dot/Trackmodul_SS26_Skripts/issues) and include: Python version, Dobot firmware version, serial port info, MQTT broker status, and the relevant log output.
 
 ## 📜 License
 
