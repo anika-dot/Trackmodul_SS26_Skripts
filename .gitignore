@@ -23,3 +23,6 @@ logs/
 scripts/logs/
 scripts/report/
 color_scanner/logs/
+
+# Auto-generated files
+*.egg-info/
