@@ -38,14 +38,16 @@ st.title("Dobot KPI Dashboard")
 uploaded_file = st.file_uploader("Upload JSONL Log File", type=["jsonl"])
 
 if not uploaded_file:
-    st.info("Bitte ein JSONL-Logfile hochladen.")
+    st.info("Please upload a JSONL log file.")
     st.stop()
 
 
-# ---------- Daten laden & KPIs berechnen ----------
-@st.cache_data(show_spinner="Analyse läuft...")
+# load data, compute KPIs + generate all plots (cached, thus only runs once per file upload)
+@st.cache_data(show_spinner="Analyzing...")
 def analyze(file_bytes: bytes):
-    """Schreibt Upload temporär, generiert KPIs + alle Plots in einem Temp-Ordner."""
+    '''
+    Load events from uploaded log file, compute KPIs, and generate plots.
+    '''
     tmpdir = Path(tempfile.mkdtemp(prefix="dobot_kpi_"))
     log_path = tmpdir / "log.jsonl"
     log_path.write_bytes(file_bytes)
@@ -55,13 +57,13 @@ def analyze(file_bytes: bytes):
     intervals = extract_action_intervals(events)
     kpis = compute_kpis(cycles, intervals, events)
 
-    # Terminal-Report in String umleiten
+    # Terminal report into string
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         print_report(kpis)
     report_text = buf.getvalue()
 
-    # Alle Plots generieren (unterdrücke print-Ausgaben der Plot-Funktionen)
+    # generate all plots into temp folder
     plotdir = tmpdir / "plots"
     plotdir.mkdir(exist_ok=True)
     with contextlib.redirect_stdout(io.StringIO()):
@@ -79,7 +81,7 @@ def analyze(file_bytes: bytes):
 events, kpis, report_text, plotdir = analyze(uploaded_file.getvalue())
 
 
-# ---------- KPI Cards ----------
+# KPI overview
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Cycles", kpis["total_cycles"])
 col2.metric("Runtime", f"{kpis['total_runtime']:.2f} s")
@@ -89,19 +91,19 @@ col4.metric("Errors", kpis["errors"])
 st.divider()
 
 
-# ---------- Tabs ----------
+# Tabs for detailed views
 tab_overview, tab_cycles, tab_phases, tab_colors, tab_actions, tab_latency, tab_gantt, tab_data = st.tabs(
-    ["Übersicht", "Zyklen", "Phasen", "Farben", "Actions", "Latenzen", "Gantt", "Rohdaten"]
+    ["Overview", "Cycles", "Phases", "Colors", "Actions", "Latencies", "Gantt", "Raw Data"]
 )
 
 
-# --- Übersicht: Terminal-Report ---
+# Overview + terminal report
 with tab_overview:
     st.subheader("KPI Report (Terminal-Output)")
     st.code(report_text, language="text")
 
 
-# --- Zyklen ---
+# Cycles
 with tab_cycles:
     st.subheader("Duration per Cycle")
     st.image(str(plotdir / "cycle_durations.png"))
@@ -110,7 +112,7 @@ with tab_cycles:
     st.dataframe(pd.DataFrame([kpis["cycle_stats"]]).T.rename(columns={0: "value"}))
 
 
-# --- Phasen ---
+# Phases
 with tab_phases:
     st.subheader("Average Duration per Phase")
     st.image(str(plotdir / "phase_comparison.png"))
@@ -122,14 +124,14 @@ with tab_phases:
     st.dataframe(pd.DataFrame(kpis["phase_stats"]).T)
 
 
-# --- Farben ---
+# Colors
 with tab_colors:
     st.subheader("Detected Colors")
     color_png = plotdir / "color_distribution.png"
     if color_png.exists():
         st.image(str(color_png))
     else:
-        st.info("Keine Farbdaten verfügbar.")
+        st.info("No color data available.")
 
     st.dataframe(
         pd.DataFrame(
@@ -139,7 +141,7 @@ with tab_colors:
     )
 
 
-# --- Actions ---
+# Actions
 with tab_actions:
     st.subheader("Distribution of Action Durations")
     st.image(str(plotdir / "action_boxplot.png"))
@@ -148,14 +150,14 @@ with tab_actions:
     st.dataframe(pd.DataFrame(kpis["action_stats"]).T)
 
 
-# --- Latenzen ---
+# Latencies
 with tab_latency:
     st.subheader("Latency Distribution")
     lat_png = plotdir / "latencies.png"
     if lat_png.exists():
         st.image(str(lat_png))
     else:
-        st.info("Keine Latenzdaten verfügbar.")
+        st.info("No latency data available.")
 
     st.subheader("Latency Statistics (ms)")
     rows = []
@@ -175,13 +177,13 @@ with tab_latency:
         st.dataframe(pd.DataFrame(rows).set_index("metric"))
 
 
-# --- Gantt ---
+# Gantt chart
 with tab_gantt:
     st.subheader("Gantt Chart")
     st.image(str(plotdir / "gantt_chart.png"))
 
 
-# --- Rohdaten + Downloads ---
+# Raw Data + downloads
 with tab_data:
     st.subheader("Cycles")
     df_cycles = pd.DataFrame(kpis["cycles"])
