@@ -159,21 +159,16 @@ jupyter notebook instructions/define_positions.ipynb
 
 #### Generate analysis outputs
 
-After a run, replace the log filename with your actual file:
-
-```bash
-# Gantt chart
-python scripts/create_gantt.py logs/dobot_log_2026-05-19.jsonl --output gantt.png
-
-# KPI report and diagrams (saved to report/)
-python scripts/generate_kpi.py logs/dobot_log_2026-05-19.jsonl
-```
-
-### Get KPI and diagrams
-
 To get the KPI and diagrams of your process, run the following command in your terminal (you have to change the name of the log file):
 ```bash
 python scripts/generate_kpi.py logs/dobot_log_2026-05-19.jsonl 
+```
+
+#### Start dashboard
+
+To start the dashboard and see all plots and outputs in one file, use this code:
+```bash
+streamlit run dashboard.py
 ```
 
 ## 🏗️ Project Structure
