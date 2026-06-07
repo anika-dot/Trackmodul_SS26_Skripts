@@ -47,7 +47,6 @@ def on_message(client, userdata, msg):
 
         log.info("color_scanning_finished", color=color)
           
-        
         client.publish("trackmodul_ah_SS26/dobot/colorsensor/status", json.dumps({
             "status": "done",
             "color": color  
