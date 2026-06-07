@@ -29,19 +29,58 @@ The system processes items through a complete workflow: pick-up → detection �
 ## 👩‍💻 Tech Stack
 
 - **Language**: Python 3
-- **Libraries**: 
-  - `dobotapi` - Dobot robot control
-  - `pydobotplus` - Extended Dobot functionality for color sensor
-  - `paho-mqtt` - MQTT client for message brokering
-  - `pyserial` - Serial communication
-  - `pyyaml` - Configuration management
-  - `coloredlogs` - Enhanced logging
 - **Communication**: Public MQTT Broker (HiveMQ)
 - **Platforms**: VisualStudioCode
-- **Hardware**:
+
+### Main Libraries
+
+| Library | Purpose |
+|----------|----------|
+| `dobotapi` | Dobot robot control |
+| `pydobotplus` | Extended Dobot functionality for color sensor |
+| `paho-mqtt` | MQTT communication |
+| `pyserial` | Serial communication |
+| `pyyaml` | Configuration management |
+| `coloredlogs` | Enhanced logging |
+| `streamlit` | Dashboard visualization |
+| `pandas` | KPI calculation and data analysis |
+| `matplotlib` | KPI and process visualization |
+
+### Python Environments
+
+The project uses **two separate virtual environments**:
+
+#### Main Control Environment
+
+Used for:
+- Controller
+- Pick & Place Dobot
+- Sorting Dobot
+- Dashboard
+- KPI generation
+
+Dependencies are defined in:
+
+```text
+requirements.txt
+```
+
+#### Color Scanner Environment
+
+Used for:
+- Color sensor module (`color_scanner/scan_color.py`)
+
+Dependencies are defined in:
+
+```text
+color_scanner/requirements.txt
+```
+
+### Hardware
+
 - Dobot Magician "Pickplace" — with gripper arm, conveyor belt, and light barrier
 - Dobot Magician "Sorter" — with gripper arm and color sensor
-- RaspberryPi (both Dobots connected via USB)
+- Raspberry Pi (both Dobots connected via USB)
 
 ## 📦 Getting Started
 
@@ -81,19 +120,18 @@ The project uses a YAML-based configuration. Before running, verify the followin
    cd Trackmodul_SS26_Skripts
    ```
 
-2. **Create and activate a virtual environment**
+2. **Create the main virtual environment**
    ```bash
-   python3 -m venv ~/venv
-   source ~/venv/bin/activate
-   ```
-
-3. **Install dependencies**
-   ```bash
+   python3 -m venv ~/venv_main
+   source ~/venv_main/bin/activate
    pip install -r requirements.txt
    ```
 
-4. **For the color scanner module**
+3. **Create the color scanner virtual environment**
    ```bash
+   python3 -m venv ~/venv_color
+   source ~/venv_color/bin/activate
+
    cd color_scanner
    pip install -r requirements.txt
    cd ..
@@ -118,8 +156,16 @@ The project uses a YAML-based configuration. Before running, verify the followin
 
 Always activate the virtual environment first:
 
+For controller, pick & place, sorter, dashboard and KPI generation:
+
 ```bash
-source ~/venv/bin/activate
+source ~/venv_main/bin/activate
+```
+
+For the color scanner:
+
+```bash
+source ~/venv_color/bin/activate
 ```
 
 **1. Initialize robot positions** (run once before first use):
