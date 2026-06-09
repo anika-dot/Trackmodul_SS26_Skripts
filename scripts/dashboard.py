@@ -1,5 +1,5 @@
 '''
-Streamlit dashboard for visualizing KPIs from Dobot logs.
+This module provides a Streamlit dashboard for visualizing KPIs from Dobot logs.
 
 Usage:
     streamlit run dashboard.py
@@ -77,9 +77,7 @@ def analyze(file_bytes: bytes):
 
     return events, kpis, report_text, plotdir
 
-
 events, kpis, report_text, plotdir = analyze(uploaded_file.getvalue())
-
 
 # KPI overview
 col1, col2, col3, col4 = st.columns(4)
@@ -87,42 +85,33 @@ col1.metric("Cycles", kpis["total_cycles"])
 col2.metric("Runtime", f"{kpis['total_runtime']:.2f} s")
 col3.metric("Success Rate", f"{kpis['success_rate']:.1f}%")
 col4.metric("Errors", kpis["errors"])
-
 st.divider()
-
 
 # Tabs for detailed views
 tab_overview, tab_cycles, tab_phases, tab_colors, tab_actions, tab_latency, tab_gantt, tab_data = st.tabs(
     ["Overview", "Cycles", "Phases", "Colors", "Actions", "Latencies", "Gantt", "Raw Data"]
 )
 
-
 # Overview + terminal report
 with tab_overview:
     st.subheader("KPI Report (Terminal-Output)")
     st.code(report_text, language="text")
 
-
 # Cycles
 with tab_cycles:
     st.subheader("Duration per Cycle")
     st.image(str(plotdir / "cycle_durations.png"))
-
     st.subheader("Cycle Stats")
     st.dataframe(pd.DataFrame([kpis["cycle_stats"]]).T.rename(columns={0: "value"}))
-
 
 # Phases
 with tab_phases:
     st.subheader("Average Duration per Phase")
     st.image(str(plotdir / "phase_comparison.png"))
-
     st.subheader("Time Distribution per Cycle")
     st.image(str(plotdir / "phase_breakdown.png"))
-
     st.subheader("Phase Statistics")
     st.dataframe(pd.DataFrame(kpis["phase_stats"]).T)
-
 
 # Colors
 with tab_colors:
@@ -132,7 +121,7 @@ with tab_colors:
         st.image(str(color_png))
     else:
         st.info("No color data available.")
-
+    
     st.dataframe(
         pd.DataFrame(
             list(kpis["color_distribution"].items()),
@@ -140,15 +129,12 @@ with tab_colors:
         )
     )
 
-
 # Actions
 with tab_actions:
     st.subheader("Distribution of Action Durations")
     st.image(str(plotdir / "action_boxplot.png"))
-
     st.subheader("Action Statistics")
     st.dataframe(pd.DataFrame(kpis["action_stats"]).T)
-
 
 # Latencies
 with tab_latency:
@@ -176,12 +162,10 @@ with tab_latency:
     if rows:
         st.dataframe(pd.DataFrame(rows).set_index("metric"))
 
-
 # Gantt chart
 with tab_gantt:
     st.subheader("Gantt Chart")
     st.image(str(plotdir / "gantt_chart.png"))
-
 
 # Raw Data + downloads
 with tab_data:

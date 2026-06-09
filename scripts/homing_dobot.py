@@ -1,7 +1,5 @@
-
 '''
-Module to initialize and home the Dobots, and print their status. 
-This is a simple test script to verify that the Dobots are connected and can be controlled.
+This module is used to initialize and home the Dobots, and print their status. 
 Make sure to adjust the port selection in the code if necessary, 
 as the order of the ports may vary on different systems.
 '''
