@@ -1,8 +1,8 @@
 #!/bin/bash
 # ============================================================
-#  Trackmodul SS26 – Zentrales Startskript
-#  Startet alle 4 Prozesse in separaten Terminals / tmux-Panes
-#  Beenden: ./start_all.sh stop
+# Centralized startup script for all processes in the trackmodule SS26 project.
+# Starts all 4 processes in separate terminals / tmux panes.
+# To stop: ./start_all.sh stop
 # ============================================================
 
 BASE_DIR="$HOME/Trackmodul_SS26_Skripts"
@@ -10,11 +10,11 @@ COLOR_DIR="$BASE_DIR/color_scanner"
 PID_FILE="/tmp/trackmodul_pids.txt"
 
 start_all() {
-    echo "▶  Starte Trackmodul SS26 Prozesse..."
+    echo "Start all trackmodule processes..."
 
-    # ── 0) Homing beider Dobots ──────────────────────────────────────────────
+    # 0) Home both Dobots first
     echo ""
-    echo "🏠  Homing Dobots (bitte warten bis abgeschlossen)..."
+    echo "Homing both Dobots..."
     (
         cd "$BASE_DIR" || exit 1
         source venv/bin/activate
@@ -24,19 +24,19 @@ start_all() {
 
     if [ $HOMING_EXIT -ne 0 ]; then
         echo ""
-        echo "❌  Homing fehlgeschlagen (Exit-Code $HOMING_EXIT). Prozesse werden NICHT gestartet."
-        echo "    Bitte Verbindung zu den Dobots prüfen und erneut versuchen."
+        echo "Homing failed, stopping all processes."
+        echo "    Please check both Dobots and ensure they are properly connected and can move freely."
         exit 1
     fi
 
-    echo "  ✓ Homing abgeschlossen"
+    echo "Homing successful, starting main processes..."
     echo ""
-    sleep 1   # kurze Pause nach dem Homing
+    sleep 1   # short pause before starting main processes
 
-    # Alte PID-Datei löschen
+    # Delete old PID file if exists
     rm -f "$PID_FILE"
 
-    # 1) color_scanner – eigenes venv
+    # 1) color_scanner – separate venv
     (
         cd "$COLOR_DIR" || exit 1
         source venv/bin/activate
@@ -44,11 +44,11 @@ start_all() {
         echo $! >> "$PID_FILE"
         wait
     ) &
-    echo "  ✓ scan_color.py gestartet (PID $!)"
+    echo "Color scanner started (PID $!)"
 
-    sleep 0.5   # kurze Pause, damit Ports nicht kollidieren
+    sleep 0.5   # short pause, so ports don't collide
 
-    # 2) dobot_sorter – Haupt-venv
+    # 2) dobot_sorter – main -venv
     (
         cd "$BASE_DIR" || exit 1
         source venv/bin/activate
@@ -56,11 +56,11 @@ start_all() {
         echo $! >> "$PID_FILE"
         wait
     ) &
-    echo "  ✓ dobot_sorter.py gestartet (PID $!)"
+    echo "Dobot sorter started (PID $!)"
 
     sleep 0.5
 
-    # 3) dobot_pickplace – Haupt-venv
+    # 3) dobot_pickplace – main -venv
     (
         cd "$BASE_DIR" || exit 1
         source venv/bin/activate
@@ -68,11 +68,11 @@ start_all() {
         echo $! >> "$PID_FILE"
         wait
     ) &
-    echo "  ✓ dobot_pickplace.py gestartet (PID $!)"
+    echo "Dobot pickplace started (PID $!)"
 
     sleep 0.5
 
-    # 4) controller – Haupt-venv (zuletzt, da oft der Orchestrator)
+    # 4) controller – main -venv (last, as it depends on the others)
     (
         cd "$BASE_DIR" || exit 1
         source venv/bin/activate
@@ -80,42 +80,42 @@ start_all() {
         echo $! >> "$PID_FILE"
         wait
     ) &
-    echo "  ✓ controller.py gestartet (PID $!)"
+    echo "Controller started (PID $!)"
 
     echo ""
-    echo "✅  Alle Prozesse laufen. Stoppen mit:  ./start_all.sh stop"
-    echo "    (oder mit der GUI: python launcher_gui.py)"
+    echo "All processes started. Stop with:  ./start_all.sh stop"
+    echo "    (or with the GUI: python launcher_gui.py)"
 }
 
 stop_all() {
-    echo "⏹  Stoppe alle Trackmodul-Prozesse..."
+    echo "Stopping all processes..."
 
-    # Direkt nach Skriptnamen killen – zuverlässigste Methode
+    # Stop processes by name, then by PID if needed
     for script in scan_color.py dobot_sorter.py dobot_pickplace.py controller.py; do
         if pkill -f "$script" 2>/dev/null; then
-            echo "  ✓ $script gestoppt"
+            echo "  ✓ $script stopped"
         else
-            echo "  – $script lief nicht"
+            echo "  – $script not running"
         fi
     done
 
-    # Kurz warten, dann mit SIGKILL nachschlagen falls nötig
+    # Wait a moment to ensure processes have stopped
     sleep 1
     for script in scan_color.py dobot_sorter.py dobot_pickplace.py controller.py; do
         pkill -9 -f "$script" 2>/dev/null
     done
 
     rm -f "$PID_FILE"
-    echo "✅  Alle Prozesse gestoppt."
+    echo "All processes stopped."
 }
 
 status_all() {
-    echo "📋  Status Trackmodul-Prozesse:"
+    echo "Status:"
     for script in scan_color.py dobot_sorter.py dobot_pickplace.py controller.py homing_dobot.py; do
         if pgrep -f "$script" > /dev/null; then
-            echo "  🟢  $script läuft (PID: $(pgrep -f "$script"))"
+            echo "  🟢  $script running (PID: $(pgrep -f "$script"))"
         else
-            echo "  🔴  $script gestoppt"
+            echo "  🔴  $script stopped"
         fi
     done
 }
@@ -130,7 +130,7 @@ case "${1:-start}" in
         start_all
         ;;
     *)
-        echo "Verwendung: $0 {start|stop|status|restart}"
+        echo "Usage: $0 {start|stop|status|restart}"
         exit 1
         ;;
 esac
