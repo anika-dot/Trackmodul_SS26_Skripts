@@ -1,8 +1,7 @@
-"""
-event_logger.py
-Strukturiertes Logging für das Dobot-System.
-Schreibt JSONL-Dateien (eine JSON-Zeile pro Event) - einfach zu parsen für Auswertungen.
-"""
+'''
+This module provides a structured logging system for the Dobot system.
+It writes JSONL files (one JSON line per event) - easy to parse for analysis.
+'''
 
 import json
 import time
@@ -12,25 +11,30 @@ from threading import Lock
 
 
 class EventLogger:
+    '''
+    EventLogger is a simple structured logger that writes events to a JSONL file.
+    '''
     def __init__(self, component, log_dir="logs", run_id=None):
-        """
-        component: Name der Komponente, z.B. "controller", "pickplace", "sorter"
-        log_dir:   Ordner in dem die Logs landen
-        run_id:    Optional gemeinsame ID für einen Durchlauf (sonst Zeitstempel des Tages)
-        """
+        '''
+        Initializes the EventLogger.
+
+        Args:
+            component (str): Name of the component logging events.
+            log_dir (str): Directory where log files will be stored.
+            run_id (str, optional): Unique ID for the logging session. If None, uses the current date.
+        '''
         self.component = component
         os.makedirs(log_dir, exist_ok=True)
 
-        # Ein Log pro Tag - so landen alle Komponenten desselben Tages in derselben Datei
-        # (kann man später beliebig anders machen)
+        # One log file per day (could be changed to per run if needed).
         if run_id is None:
             run_id = datetime.now().strftime("%Y-%m-%d")
         self.run_id = run_id
 
         self.log_path = os.path.join(log_dir, f"dobot_log_{run_id}.jsonl")
-        self._lock = Lock()  # Thread-sicher, falls MQTT-Callbacks parallel feuern
+        self._lock = Lock()  # Thread-safety if multiple threads log to the same file
 
-        # Für Dauer-Messungen: Start-Zeitpunkte zwischenspeichern
+        # For tracking open actions (start without end)
         self._open_events = {}
 
         self._write({
@@ -39,10 +43,12 @@ class EventLogger:
         })
 
     def _write(self, payload):
-        """Schreibt eine Zeile in die Logdatei. Immer mit Zeitstempel und Komponente."""
+        '''
+        Writes a line to the log file. Always includes a timestamp and component.
+        '''
         record = {
-            "ts": time.time(),                                    # Unix-Timestamp (für Berechnungen)
-            "ts_iso": datetime.now().isoformat(timespec="milliseconds"),  # Lesbar
+            "ts": time.time(),                                    # Unix-Timestamp (for computing durations, sorting, etc.)
+            "ts_iso": datetime.now().isoformat(timespec="milliseconds"),  # ISO format
             "component": self.component,
             **payload,
         }
@@ -50,25 +56,32 @@ class EventLogger:
             with open(self.log_path, "a", encoding="utf-8") as f:
                 f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
-    # --- Einfache Events (Punkt-Ereignisse) ---
+    # Simple info and error logging (no duration)
     def info(self, event, **fields):
-        """Loggt ein einzelnes Ereignis ohne Dauer."""
+        '''
+        Logs a simple info event without a duration.
+        '''
         self._write({"level": "INFO", "event": event, **fields})
 
     def error(self, event, **fields):
+        '''
+        Logs a simple error event without a duration.
+        '''
         self._write({"level": "ERROR", "event": event, **fields})
 
-    # --- Aktionen mit Dauer (Start + Ende) ---
+    # Actions with start and end (for measuring durations)
     def start(self, action, **fields):
-        """
-        Markiert den Start einer Aktion. 'action' ist der eindeutige Name,
-        z.B. 'move_to_pick', 'gripper_close', 'sorting_blue'.
-        """
+        '''
+        Marks the start of an action. 'action' is the unique name,
+        e.g., 'move_to_pick', 'gripper_close', 'sorting_blue'.
+        '''
         self._open_events[action] = time.time()
         self._write({"level": "INFO", "event": "action_start", "action": action, **fields})
 
     def end(self, action, **fields):
-        """Markiert das Ende einer mit start() begonnenen Aktion."""
+        ''' 
+        Marks the end of an action started with start().
+        '''
         start_ts = self._open_events.pop(action, None)
         duration = (time.time() - start_ts) if start_ts else None
         self._write({
@@ -79,13 +92,14 @@ class EventLogger:
             **fields,
         })
 
-    # --- Context-Manager für ganz bequemes Messen ---
+    # Context manager for timing actions (syntactic sugar)
     def timed(self, action, **fields):
-        """
-        Verwendung:
+        '''
+        Context manager to automatically log start and end of an action, including duration.
+        Usage:
             with logger.timed("move_to_pick"):
                 dobot.move_to(...)
-        """
+        '''
         return _TimedAction(self, action, fields)
 
 
@@ -104,4 +118,4 @@ class _TimedAction:
             self.logger.end(self.action, status="error", error=str(exc_val))
         else:
             self.logger.end(self.action, status="ok")
-        return False  # Exception nicht schlucken
+        return False  # Don't suppress exceptions

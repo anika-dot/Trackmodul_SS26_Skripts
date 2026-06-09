@@ -1,3 +1,9 @@
+'''
+This module contains helper functions for working with Dobots, 
+including finding available ports, initializing and homing the Dobot, 
+and performing safe movements.
+'''
+
 from serial.tools import list_ports
 from serial import Serial, SerialException
 from time import sleep
@@ -90,3 +96,4 @@ def safe_move(bot, target, safe_z=SAFE_Z):
     # 4. move down vertically to target Z
     bot.move_to(x, y, z, r, mode=1)
     sleep(1)
+    
